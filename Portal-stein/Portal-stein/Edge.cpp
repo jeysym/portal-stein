@@ -21,8 +21,9 @@ namespace ps {
 	bool Edge::intersect(Ray ray, EdgeIntersection & intersection)
 	{
 		sf::Vector2f solution;
+		float det = determinant(ray.direction, to - from);
 		bool solveable = solveLinEq(ray.direction, from - to, from - ray.position, solution);
-		if (solveable == false || solution.y < 0 || solution.y > 1 || solution.x <= 0) {
+		if (det >= 0 || solveable == false || solution.y < 0 || solution.y > 1 || solution.x <= 0) {
 			return false;
 		}
 		else {
