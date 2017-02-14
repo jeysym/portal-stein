@@ -1,43 +1,102 @@
-#include <iostream>
 #include <SFML/Graphics.hpp>
+#include "RayCaster.hpp"
+#include "Math.hpp"
 
-int main(int argc, char * * args) {
-	int width = 800;
-	int height = 600;
-	
-	sf::RenderWindow window(sf::VideoMode(width, height), "Portal-stein");
+namespace ps {
 
-	sf::Font comicSans;
-	comicSans.loadFromFile("Comic_Sandchez.ttf");
+	std::shared_ptr<Scene> makeTestScene() {
+		sf::Vector2f lt{ -5.0f, 5.0f };
+		sf::Vector2f lb{ -5.0f, -5.0f };
+		sf::Vector2f rt{ 5.0f, 5.0f };
+		sf::Vector2f rb{ 5.0f, -5.0f };
 
-	sf::Text wipText{ "Work in progress...", comicSans, 40 };
+		auto scene = std::make_shared<Scene>();
+		floorPtr floor = std::make_shared<Floor>();
+		ceilingPtr ceiling = std::make_shared<Ceiling>();
 
-	while (window.isOpen())
-	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
+		Segment segment{ floor, ceiling };
+		segment.edges.push_back(std::make_shared<ColoredEdge>(lt, rt, sf::Color::Blue));
+		segment.edges.push_back(std::make_shared<ColoredEdge>(rt, rb, sf::Color::Green));
+		segment.edges.push_back(std::make_shared<ColoredEdge>(rb, lb, sf::Color::Red));
+		segment.edges.push_back(std::make_shared<ColoredEdge>(lb, lt, sf::Color::Yellow));
+		scene->segments.push_back(segment);
 
-		window.clear();
-		
-
-		float recWid = width / 10.0f;
-		float recHei = height;
-		for (int i = 0; i < 10; ++i) {
-			sf::RectangleShape rectangle{ sf::Vector2f{recWid, recHei} };
-			sf::Uint8 red = i * 255 / 9;
-			rectangle.setFillColor(sf::Color{ red, (sf::Uint8)(255 - red), 0 });
-			rectangle.move(sf::Vector2f{(float)( i * recWid), 0.0f });
-			window.draw(rectangle);
-		}
-
-		window.draw(wipText);
-
-		window.display();
+		return scene;
 	}
 
-	return 0;
+	int main() {
+		unsigned int wWidth = 800;
+		unsigned int wHeight = 600;
+
+		float walkSpeed = 1.8 / 1000.0;
+		float rotateSpeed = 1.5 / 1000.0;
+		float hFOV = (float)PI * 0.3f;
+
+		
+
+		Camera camera{ sf::Vector2f{0.0f, 0.0f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
+		
+
+		RayCaster caster{ wWidth, wHeight, makeTestScene(), camera };
+
+		sf::RenderWindow window{ sf::VideoMode{wWidth, wHeight}, "Portal-stein" };
+		window.setVerticalSyncEnabled(true);
+
+		sf::Font font;
+		font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
+		sf::Text info{ "NA", font };
+		info.setFillColor(sf::Color::Black);
+
+		// get the clock object
+		sf::Clock clock;
+
+		while (window.isOpen())
+		{
+			// measure the time elapsed from the last draw
+			float msElapsed = clock.getElapsedTime().asMilliseconds();
+			clock.restart();
+
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				// dispatch all the events in the queue
+
+				if (event.type == sf::Event::Closed)
+					window.close();
+
+				if (event.type == sf::Event::KeyPressed) {
+					switch (event.key.code) {
+					case sf::Keyboard::W:
+						caster.camera.goForward(walkSpeed * msElapsed);
+						break;
+					case sf::Keyboard::S:
+						caster.camera.goForward(-walkSpeed * msElapsed);
+						break;
+					case sf::Keyboard::A:
+						caster.camera.rotate(rotateSpeed * msElapsed);
+						break;
+					case sf::Keyboard::D:
+						caster.camera.rotate(-rotateSpeed * msElapsed);
+						break;
+					}
+				}
+			}
+
+			window.clear(sf::Color::Black);
+
+			caster.render(window);
+			info.setString("pos = [" + std::to_string(caster.camera.position.x) + "," + std::to_string(caster.camera.position.y) + "]\n"
+						+  "dir = [" + std::to_string(caster.camera.direction.x) + "," + std::to_string(caster.camera.direction.y) + "]");
+
+			window.draw(info);
+
+			window.display();
+		}
+
+		return 0;
+	}
+}
+
+int main() {
+	return ps::main();
 }

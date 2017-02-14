@@ -154,7 +154,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Edge.cpp" />
+    <ClCompile Include="FloorCeiling.cpp" />
     <ClCompile Include="portal-stein.cpp" />
+    <ClCompile Include="Portal.cpp" />
+    <ClCompile Include="RayCaster.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneObject.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Edge.hpp" />
+    <ClInclude Include="FloorCeiling.hpp" />
+    <ClInclude Include="Math.hpp" />
+    <ClInclude Include="Portal.hpp" />
+    <ClInclude Include="RayCaster.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="SceneObject.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
