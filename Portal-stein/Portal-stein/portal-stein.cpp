@@ -10,16 +10,28 @@ namespace ps {
 		sf::Vector2f rt{ 5.0f, 5.0f };
 		sf::Vector2f rb{ 5.0f, -5.0f };
 
-		auto scene = std::make_shared<Scene>();
-		floorPtr floor = std::make_shared<Floor>();
-		ceilingPtr ceiling = std::make_shared<Ceiling>();
+		sf::Vector2f other{ 13.0f, 0.0f };
 
-		Segment segment{ floor, ceiling };
-		segment.edges.push_back(std::make_shared<ColoredEdge>(lt, rt, sf::Color::Blue));
-		segment.edges.push_back(std::make_shared<ColoredEdge>(rt, rb, sf::Color::Green));
-		segment.edges.push_back(std::make_shared<ColoredEdge>(rb, lb, sf::Color::Red));
-		segment.edges.push_back(std::make_shared<ColoredEdge>(lb, lt, sf::Color::Yellow));
-		scene->segments.push_back(segment);
+		auto scene = std::make_shared<Scene>();
+		floorPtr floor = std::make_shared<ColoredFloor>(sf::Color::Green);
+		ceilingPtr ceiling = std::make_shared<ColoredCeiling>(sf::Color::Cyan);
+
+		std::unique_ptr<Portal> door1 = std::make_unique<Door>(1);
+		std::unique_ptr<Portal> door2 = std::make_unique<Door>(0);
+
+		Segment segment0{ floor, ceiling };
+		segment0.edges.push_back(std::make_shared<ColoredEdge>(lt, rt, sf::Color::Blue));
+		segment0.edges.push_back(std::make_shared<ColoredEdge>(rt, rb, sf::Color::White, door1));
+		segment0.edges.push_back(std::make_shared<ColoredEdge>(rb, lb, sf::Color::Red));
+		segment0.edges.push_back(std::make_shared<ColoredEdge>(lb, lt, sf::Color::Yellow));
+
+		Segment segment1{ floor, ceiling };
+		segment1.edges.push_back(std::make_shared<ColoredEdge>(rt, other, sf::Color{ 242, 131, 5 }));
+		segment1.edges.push_back(std::make_shared<ColoredEdge>(other, rb, sf::Color{ 0, 20, 240 }));
+		segment1.edges.push_back(std::make_shared<ColoredEdge>(rb, rt, sf::Color::White, door2));
+
+		scene->segments.push_back(segment0);
+		scene->segments.push_back(segment1);
 
 		return scene;
 	}
@@ -34,7 +46,7 @@ namespace ps {
 
 		
 
-		Camera camera{ sf::Vector2f{0.0f, 0.0f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
+		Camera camera{ sf::Vector3f{0.0f, 0.0f, 0.5f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
 		
 
 		RayCaster caster{ wWidth, wHeight, makeTestScene(), camera };

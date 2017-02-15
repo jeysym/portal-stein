@@ -22,10 +22,19 @@ namespace ps {
 		direction.y = sin(angle) * x + cos(angle) * y;
 	}
 
-	void SceneObject::rotateAround(float angle, sf::Vector2f center)
+	void SceneObject::rotatePosAround(float angle, sf::Vector2f center)
 	{
 		move(-center.x, -center.y); // move rotation center to the origin
 		rotate(angle); // rotate 
 		move(center.x, center.y); // move rotation center back
+	}
+
+	SceneHObject::SceneHObject(sf::Vector3f position_, sf::Vector2f direction_, std::size_t segmentId_) : SceneObject(sf::Vector2f{position_.x, position_.y}, direction_, segmentId_), height(position_.z) { }
+
+	SceneHObject::SceneHObject(sf::Vector2f position_, float height_, sf::Vector2f direction_, std::size_t segmentId_) : SceneObject(position_, direction_, segmentId_), height(height_) { }
+	
+	void SceneHObject::ascend(float distance)
+	{
+		height += distance;
 	}
 }

@@ -2,7 +2,7 @@
 #include "Math.hpp"
 
 namespace ps {
-	Door::Door(std::size_t targetSegment_) : targetSegment(targetSegment) {	}
+	Door::Door(std::size_t targetSegment_) : targetSegment(targetSegment_) {	}
 
 	void Door::stepThrough(SceneObject & obj)
 	{
@@ -22,7 +22,7 @@ namespace ps {
 
 	void Teleport::stepThrough(SceneObject & obj)
 	{
-		obj.rotateAround(rotateAngle, rotationCentrum);
+		obj.rotatePosAround(rotateAngle, rotationCentrum);
 		obj.move(move.x, move.y);
 	}
 }

@@ -5,6 +5,7 @@
 #include "Edge.hpp"
 #include <vector>
 #include <memory>
+#include <SFML\Graphics.hpp>
 
 namespace ps {
 

@@ -73,6 +73,15 @@ namespace ps {
 		return sf::Vector2<T> {vector.y, -vector.x};
 	}
 
+	template<typename T>
+	inline T minimum(T a, T b) {
+		return (a < b) ? a : b;
+	}
+
+	template<typename T>
+	inline T maximum(T a, T b) {
+		return (a > b) ? a : b;
+	}
 }
 
 #endif // !PS_MATH_INCLUDED

@@ -7,14 +7,13 @@
 #include <SFML\Graphics.hpp>
 
 namespace ps {
-	class Camera : public SceneObject {
+	class Camera : public SceneHObject {
 	public:
 
-		Camera(sf::Vector2f origin, sf::Vector2f direction, std::size_t segment, float hFOV, float aspectRatio);
+		Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV, float aspectRatio);
 
 		void rotate(float angle);
 
-		float cameraHeight;
 		sf::Vector2f viewPlane;
 		float viewPlaneHeight;
 
@@ -29,6 +28,11 @@ namespace ps {
 		RayCaster(unsigned int width_, unsigned int height_, std::shared_ptr<Scene> scene_, Camera camera_);
 
 		void render(sf::RenderTarget & rt);
+
+	private:
+		Ray generateRay(int i);
+		void renderPart(sf::RenderTarget & rt, sf::FloatRect renderArea, Ray ray);
+		float projectToScreen(float height, float distance);
 	};
 }
 

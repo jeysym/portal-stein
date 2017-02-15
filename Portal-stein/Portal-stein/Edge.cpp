@@ -44,6 +44,10 @@ namespace ps {
 
 	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_) : Edge(from, to), color(color_) { }
 
+	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), color(color_)
+	{
+	}
+
 	void TexturedEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist)
 	{
 		sf::RectangleShape rect{ sf::Vector2f{ renderArea.width, renderArea.height } };
@@ -53,5 +57,9 @@ namespace ps {
 	}
 
 	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Edge(from, to), texture(texture_) { }
+
+	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), texture(texture_)
+	{
+	}
 
 }

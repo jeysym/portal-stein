@@ -19,11 +19,24 @@ namespace ps {
 		void move(float x, float y);
 		// Rotates the object, which changes its direction.
 		void rotate(float angle);
-		// Rotates around specific point.
-		void rotateAround(float angle, sf::Vector2f center);
+
+		// Rotates position around specific point.
+		void rotatePosAround(float angle, sf::Vector2f center);
 	};
 
-	using Ray = SceneObject;
+	// SceneObject with height information.
+	class SceneHObject : public SceneObject {
+	public:
+		float height;	// height of the object position.
+
+		SceneHObject(sf::Vector3f position_, sf::Vector2f direction_, std::size_t segmentId_);
+		SceneHObject(sf::Vector2f position_, float height_, sf::Vector2f direction_, std::size_t segmentId_);
+
+		// Lifts the object up.
+		void ascend(float distance);
+	};
+
+	using Ray = SceneHObject;
 }
 
 #endif // !PS_SCENE_OBJECT_INCLUDED

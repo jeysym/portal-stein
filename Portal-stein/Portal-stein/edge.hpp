@@ -13,6 +13,7 @@ namespace ps {
 	class Edge {
 	public:
 		sf::Vector2f from, to;
+		float height = 1.0f;
 		std::unique_ptr<Portal> portal;
 
 		Edge(sf::Vector2f from_, sf::Vector2f to_);
@@ -35,6 +36,7 @@ namespace ps {
 		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist);
 
 		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
+		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
 	private:
 		sf::Color color;
 	};
@@ -44,6 +46,7 @@ namespace ps {
 		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist);
 
 		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
+		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);
 	private:
 		sf::Texture texture;
 	};
