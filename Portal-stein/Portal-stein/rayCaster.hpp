@@ -16,7 +16,7 @@ namespace ps {
 
 		sf::Vector2f viewPlane;
 		float viewPlaneHeight;
-
+		float hFOV, vFOV;
 	};
 
 	class RayCaster {

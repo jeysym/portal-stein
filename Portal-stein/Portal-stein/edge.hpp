@@ -22,7 +22,7 @@ namespace ps {
 		bool isPortal();
 		void stepThrough(SceneObject & obj);
 		bool intersect(Ray ray, EdgeIntersection & intersection);
-		virtual void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist) = 0;
+		virtual void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth) = 0;
 	};
 
 	struct EdgeIntersection {
@@ -33,7 +33,7 @@ namespace ps {
 
 	class ColoredEdge : public Edge {
 	public:
-		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist);
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
 
 		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
 		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
@@ -43,7 +43,7 @@ namespace ps {
 
 	class TexturedEdge : public Edge {
 	public:
-		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist);
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
 
 		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
 		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);

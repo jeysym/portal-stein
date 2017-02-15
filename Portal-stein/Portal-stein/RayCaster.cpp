@@ -70,7 +70,8 @@ namespace ps {
 					renderPart(rt, edgeArea, ray);	// edge (segment behind it) is drawn
 				}
 				else {
-					hitEdge.draw(rt, edgeArea, d);
+					float edgeWidth = 2.0f * d * tan(camera.hFOV / (2 * width));
+					hitEdge.draw(rt, edgeArea, intersection.edgeDist, edgeWidth);
 				}
 
 				segment.floor->draw(rt, floorArea, sf::Vector2f{ 0.0f, 0.0f }, sf::Vector2f{ 0.0f, 0.0f }); // TODO: make floor & edge draw correctly (for textured floor)
@@ -96,8 +97,9 @@ namespace ps {
 		return scrH;
 	}
 
-	Camera::Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV, float aspectRatio) : viewPlane(), SceneHObject(origin, direction, segment)
+	Camera::Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV_, float aspectRatio) : viewPlane(), SceneHObject(origin, direction, segment)
 	{
+		hFOV = hFOV_;
 		float c = cos(hFOV / 2);
 		float viewPlaneNorm = sqrt(1 / (c*c) - 1);	// view plane length (corresponds to horizontal FOV)
 		viewPlane = getPerpendicular(direction); // view plane is perpendicular to camera direction

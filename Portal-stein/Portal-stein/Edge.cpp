@@ -28,13 +28,13 @@ namespace ps {
 		}
 		else {
 			intersection.rayDist = solution.x;
-			intersection.edgeDist = solution.y;
+			intersection.edgeDist = norm(to - from) * solution.y;
 			intersection.hitEdge = this;
 			return true;
 		}
 	}
 
-	void ColoredEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist)
+	void ColoredEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth)
 	{
 		sf::RectangleShape rect{ sf::Vector2f{renderArea.width, renderArea.height} };
 		rect.setPosition(renderArea.left, renderArea.top);
@@ -48,18 +48,21 @@ namespace ps {
 	{
 	}
 
-	void TexturedEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist)
+	void TexturedEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth)
 	{
 		sf::RectangleShape rect{ sf::Vector2f{ renderArea.width, renderArea.height } };
 		rect.setPosition(renderArea.left, renderArea.top);
-		rect.setFillColor(sf::Color::Magenta);	//TODO: make proper texture drawing
+		rect.setTexture(& texture);
+		rect.setTextureRect(sf::IntRect{ (int)(edgeDist * texture.getSize().y), 0, (int)edgeWidth, (int)texture.getSize().y});
 		rt.draw(rect);
 	}
 
-	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Edge(from, to), texture(texture_) { }
+	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Edge(from, to), texture(texture_) { 
+		texture.setRepeated(true);
+	}
 
-	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), texture(texture_)
-	{
+	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), texture(texture_) {
+		texture.setRepeated(true);
 	}
 
 }

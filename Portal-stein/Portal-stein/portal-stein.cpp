@@ -5,15 +5,21 @@
 namespace ps {
 
 	std::shared_ptr<Scene> makeTestScene() {
-		sf::Vector2f lt{ -5.0f, 5.0f };
-		sf::Vector2f lb{ -5.0f, -5.0f };
-		sf::Vector2f rt{ 5.0f, 5.0f };
-		sf::Vector2f rb{ 5.0f, -5.0f };
+		sf::Texture wallTex;
+		wallTex.loadFromFile("H:\\MyData\\Textures\\wall.bmp");
+		sf::Texture metalTex;
+		metalTex.loadFromFile("H:\\MyData\\Textures\\metal.bmp");
 
-		sf::Vector2f other{ 13.0f, 0.0f };
+		sf::Vector2f lt{ -2.0f, 2.0f };
+		sf::Vector2f lb{ -2.0f, -2.0f };
+		sf::Vector2f rt{ 2.0f, 2.0f };
+		sf::Vector2f rb{ 2.0f, -2.0f };
+
+		sf::Vector2f other{ 5.0f, 0.0f };
 
 		auto scene = std::make_shared<Scene>();
 		floorPtr floor = std::make_shared<ColoredFloor>(sf::Color::Green);
+		floorPtr greyFloor = std::make_shared<ColoredFloor>(sf::Color{ 181, 179, 168 });
 		ceilingPtr ceiling = std::make_shared<ColoredCeiling>(sf::Color::Cyan);
 
 		std::unique_ptr<Portal> door1 = std::make_unique<Door>(1);
@@ -22,12 +28,12 @@ namespace ps {
 		Segment segment0{ floor, ceiling };
 		segment0.edges.push_back(std::make_shared<ColoredEdge>(lt, rt, sf::Color::Blue));
 		segment0.edges.push_back(std::make_shared<ColoredEdge>(rt, rb, sf::Color::White, door1));
-		segment0.edges.push_back(std::make_shared<ColoredEdge>(rb, lb, sf::Color::Red));
+		segment0.edges.push_back(std::make_shared<TexturedEdge>(rb, lb, metalTex));
 		segment0.edges.push_back(std::make_shared<ColoredEdge>(lb, lt, sf::Color::Yellow));
 
-		Segment segment1{ floor, ceiling };
+		Segment segment1{ greyFloor, ceiling };
 		segment1.edges.push_back(std::make_shared<ColoredEdge>(rt, other, sf::Color{ 242, 131, 5 }));
-		segment1.edges.push_back(std::make_shared<ColoredEdge>(other, rb, sf::Color{ 0, 20, 240 }));
+		segment1.edges.push_back(std::make_shared<TexturedEdge>(other, rb, metalTex));
 		segment1.edges.push_back(std::make_shared<ColoredEdge>(rb, rt, sf::Color::White, door2));
 
 		scene->segments.push_back(segment0);
@@ -42,7 +48,7 @@ namespace ps {
 
 		float walkSpeed = 1.8 / 1000.0;
 		float rotateSpeed = 1.5 / 1000.0;
-		float hFOV = (float)PI * 0.3f;
+		float hFOV = (float)PI * 0.36f;
 
 		
 
