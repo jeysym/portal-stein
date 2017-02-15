@@ -4,8 +4,6 @@
 namespace ps {
 	RayCaster::RayCaster(unsigned int width_, unsigned int height_, std::shared_ptr<Scene> scene_, Camera camera_) :  width(width_), height(height_), camera(camera_), scene(scene_) { }
 
-	
-
 	void RayCaster::render(sf::RenderTarget & rt)
 	{
 		for (int i = 0; i < width; ++i) {
@@ -14,27 +12,6 @@ namespace ps {
 			Ray ray = generateRay(i);
 
 			renderPart(rt, renderArea, ray);
-
-			/*for (auto edge : scene->segments[ray.segmentId].edges) {
-				EdgeIntersection i;
-				if (edge->intersect(ray, i)) {
-					rect.height /= i.rayDist;
-					rect.top = height / 2.0f - rect.height / 2.0f;
-					i.hitEdge->draw(rt, rect, 1.0f);
-
-					sf::RectangleShape top{ sf::Vector2f{1.0f, 500.0f} };
-					top.move(0.0f, -rect.top);
-					top.setFillColor(sf::Color::Black);
-					rt.draw(top);
-
-					sf::RectangleShape bottom{ sf::Vector2f{1.0f, 500.0f} };
-					bottom.move(0.0f, rect.top + rect.height);
-					bottom.setFillColor(sf::Color::Black);
-					rt.draw(bottom);
-
-					break;
-				}
-			}*/
 		}
 	}
 

@@ -48,11 +48,12 @@ namespace ps {
 
 		float walkSpeed = 1.8 / 1000.0;
 		float rotateSpeed = 1.5 / 1000.0;
+		float ascendSpeed = 1.2 / 1000.0;
 		float hFOV = (float)PI * 0.36f;
 
 		
 
-		Camera camera{ sf::Vector3f{0.0f, 0.0f, 0.5f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
+		Camera camera{ sf::Vector3f{0.0f, 0.0f, 0.1f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
 		
 
 		RayCaster caster{ wWidth, wHeight, makeTestScene(), camera };
@@ -96,6 +97,12 @@ namespace ps {
 					case sf::Keyboard::D:
 						caster.camera.rotate(-rotateSpeed * msElapsed);
 						break;
+					case sf::Keyboard::Q:
+						caster.camera.ascend(ascendSpeed * msElapsed);
+						break;
+					case sf::Keyboard::E:
+						caster.camera.ascend(-ascendSpeed * msElapsed);
+						break;
 					}
 				}
 			}
@@ -104,7 +111,8 @@ namespace ps {
 
 			caster.render(window);
 			info.setString("pos = [" + std::to_string(caster.camera.position.x) + "," + std::to_string(caster.camera.position.y) + "]\n"
-						+  "dir = [" + std::to_string(caster.camera.direction.x) + "," + std::to_string(caster.camera.direction.y) + "]");
+						+  "dir = [" + std::to_string(caster.camera.direction.x) + "," + std::to_string(caster.camera.direction.y) + "]\n"
+						+  "fps = " + std::to_string((int)(1000.0f / msElapsed)));
 
 			window.draw(info);
 
