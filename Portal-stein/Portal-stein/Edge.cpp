@@ -36,33 +36,36 @@ namespace ps {
 
 	void ColoredEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth)
 	{
-		sf::RectangleShape rect{ sf::Vector2f{renderArea.width, renderArea.height} };
-		rect.setPosition(renderArea.left, renderArea.top);
-		rect.setFillColor(color);
-		rt.draw(rect);
+		drawRectangle.setSize(sf::Vector2f{ renderArea.width, renderArea.height });
+		drawRectangle.setPosition(renderArea.left, renderArea.top);
+		rt.draw(drawRectangle);
 	}
 
-	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_) : Edge(from, to), color(color_) { }
+	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_) : Edge(from, to), drawRectangle() { 
+		drawRectangle.setFillColor(color_);
+	}
 
-	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), color(color_)
-	{
+	ColoredEdge::ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), drawRectangle() {
+		drawRectangle.setFillColor(color_);
 	}
 
 	void TexturedEdge::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth)
 	{
-		sf::RectangleShape rect{ sf::Vector2f{ renderArea.width, renderArea.height } };
-		rect.setPosition(renderArea.left, renderArea.top);
-		rect.setTexture(& texture);
-		rect.setTextureRect(sf::IntRect{ (int)(edgeDist * texture.getSize().y), 0, (int)edgeWidth, (int)texture.getSize().y});
-		rt.draw(rect);
+		drawRectangle.setSize(sf::Vector2f{ renderArea.width, renderArea.height });
+		drawRectangle.setPosition(renderArea.left, renderArea.top);
+		rt.draw(drawRectangle);
+		drawRectangle.setTextureRect(sf::IntRect{ (int)(edgeDist * texture.getSize().y), 0, (int)edgeWidth, (int)texture.getSize().y});
+		rt.draw(drawRectangle);
 	}
 
-	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Edge(from, to), texture(texture_) { 
+	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Edge(from, to), texture(texture_), drawRectangle() {
 		texture.setRepeated(true);
+		drawRectangle.setTexture(&texture);
 	}
 
-	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), texture(texture_) {
+	TexturedEdge::TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Edge(from, to, portal_), texture(texture_), drawRectangle() {
 		texture.setRepeated(true);
+		drawRectangle.setTexture(&texture);
 	}
 
 }

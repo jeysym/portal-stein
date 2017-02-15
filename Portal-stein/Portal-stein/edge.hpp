@@ -38,7 +38,7 @@ namespace ps {
 		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
 		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
 	private:
-		sf::Color color;
+		sf::RectangleShape drawRectangle;
 	};
 
 	class TexturedEdge : public Edge {
@@ -49,6 +49,7 @@ namespace ps {
 		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);
 	private:
 		sf::Texture texture;
+		sf::RectangleShape drawRectangle;
 	};
 
 }
