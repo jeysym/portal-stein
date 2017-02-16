@@ -31,7 +31,7 @@ namespace ps {
 			if (edge->intersect(ray, intersection)) {
 				// ray hits this edge
 				Edge & hitEdge = *intersection.hitEdge;
-				float d = intersection.rayDist;
+				float d = dot(intersection.rayDist * ray.direction, camera.direction); // fishbowl effect will be removed
 
 				float top = projectToScreen(hitEdge.height, d);
 				float bottom = projectToScreen(0.0f, d);
