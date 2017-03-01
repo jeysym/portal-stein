@@ -2,12 +2,24 @@
 #include "Math.hpp"
 
 namespace ps {
-	RayCaster::RayCaster(unsigned int width_, unsigned int height_, std::shared_ptr<Scene> scene_, Camera camera_) :  width(width_), height(height_), camera(camera_), scene(scene_) { }
+	RayCaster::RayCaster(Camera camera_) : camera(camera_) { }
+
+	void RayCaster::setScene(scenePtr scene_) {
+		scene = scene_;
+	}
+
+	Camera & RayCaster::getCamera()
+	{
+		return camera;
+	}
 
 	void RayCaster::render(sf::RenderTarget & rt)
 	{
-		for (unsigned int i = 0; i < width; ++i) {
-			sf::FloatRect renderArea { sf::Vector2f{ (float)i, 0.0f }, sf::Vector2f{ 1.0f, (float)height } }; // stip of the screen that will be drawn
+		renderWidth = rt.getSize().x;
+		renderHeight = rt.getSize().y;
+
+		for (unsigned int i = 0; i < renderWidth; ++i) {
+			sf::FloatRect renderArea { sf::Vector2f{ (float)i, 0.0f }, sf::Vector2f{ 1.0f, (float)renderHeight } }; // stip of the screen that will be drawn
 
 			Ray ray = generateRay(i);
 
@@ -17,7 +29,7 @@ namespace ps {
 
 	Ray RayCaster::generateRay(int i)
 	{
-		float k = -1.0f + 1.0f / width + i * 2.0f / width; // just conversion from "i" in [0, width-1] to "k" in (-1, 1)
+		float k = -1.0f + 1.0f / renderWidth + i * 2.0f / renderWidth; // just conversion from "i" in [0, width-1] to "k" in (-1, 1)
 		sf::Vector2f rayDir = camera.direction + k * camera.viewPlane;
 		return Ray{ camera.position, rayDir , camera.segmentId };
 	}
@@ -47,7 +59,7 @@ namespace ps {
 					renderPart(rt, edgeArea, ray);	// edge (segment behind it) is drawn
 				}
 				else {
-					float edgeWidth = 2.0f * distance * tan(camera.hFOV / (2 * width));
+					float edgeWidth = 2.0f * distance * tan(camera.hFOV / (2 * renderWidth));
 					hitEdge.draw(rt, edgeArea, intersection.distanceToWallEdge, edgeWidth);
 				}
 
@@ -70,7 +82,7 @@ namespace ps {
 	{
 		float h = hei - camera.position.z;
 		float H = h * camera.viewPlaneHeight / distance;
-		float scrH = (H - camera.viewPlaneHeight) * ((float)height / (- 2.0f * camera.viewPlaneHeight));
+		float scrH = (H - camera.viewPlaneHeight) * ((float)renderHeight / (- 2.0f * camera.viewPlaneHeight));
 		return scrH;
 	}
 

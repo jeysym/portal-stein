@@ -20,13 +20,17 @@ namespace ps {
 	};
 
 	class RayCaster {
-	public:
-		unsigned int width, height;
-		std::shared_ptr<Scene> scene;
+	private:
+		scenePtr scene;
 		Camera camera;
+		unsigned int renderWidth;
+		unsigned int renderHeight;
 
-		RayCaster(unsigned int width_, unsigned int height_, std::shared_ptr<Scene> scene_, Camera camera_);
+	public:
+		RayCaster(Camera camera_);
 
+		void setScene(scenePtr scene_);
+		Camera& getCamera();
 		void render(sf::RenderTarget & rt);
 
 	private:

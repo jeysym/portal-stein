@@ -51,9 +51,12 @@ namespace ps {
 		
 
 		Camera camera{ sf::Vector3f{0.0f, 0.0f, 0.1f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
-		
+		auto scene = makeTestScene();
 
-		RayCaster caster{ wWidth, wHeight, makeTestScene(), camera };
+		RayCaster caster{ camera };
+		caster.setScene(scene);
+
+		Camera & casterCamera = caster.getCamera();
 
 		sf::RenderWindow window{ sf::VideoMode{wWidth, wHeight}, "Portal-stein" };
 		window.setVerticalSyncEnabled(true);
@@ -83,22 +86,22 @@ namespace ps {
 				if (event.type == sf::Event::KeyPressed) {
 					switch (event.key.code) {
 					case sf::Keyboard::W:
-						caster.camera.goForward(walkSpeed * msElapsed);
+						casterCamera.goForward(walkSpeed * msElapsed);
 						break;
 					case sf::Keyboard::S:
-						caster.camera.goForward(-walkSpeed * msElapsed);
+						casterCamera.goForward(-walkSpeed * msElapsed);
 						break;
 					case sf::Keyboard::A:
-						caster.camera.rotate(rotateSpeed * msElapsed);
+						casterCamera.rotate(rotateSpeed * msElapsed);
 						break;
 					case sf::Keyboard::D:
-						caster.camera.rotate(-rotateSpeed * msElapsed);
+						casterCamera.rotate(-rotateSpeed * msElapsed);
 						break;
 					case sf::Keyboard::Q:
-						caster.camera.ascend(ascendSpeed * msElapsed);
+						casterCamera.ascend(ascendSpeed * msElapsed);
 						break;
 					case sf::Keyboard::E:
-						caster.camera.ascend(-ascendSpeed * msElapsed);
+						casterCamera.ascend(-ascendSpeed * msElapsed);
 						break;
 					}
 				}
@@ -107,8 +110,8 @@ namespace ps {
 			window.clear(sf::Color::Black);
 
 			caster.render(window);
-			info.setString("pos = [" + std::to_string(caster.camera.position.x) + "," + std::to_string(caster.camera.position.y) + "]\n"
-						+  "dir = [" + std::to_string(caster.camera.direction.x) + "," + std::to_string(caster.camera.direction.y) + "]\n"
+			info.setString("pos = [" + std::to_string(casterCamera.position.x) + "," + std::to_string(casterCamera.position.y) + "]\n"
+						+  "dir = [" + std::to_string(casterCamera.direction.x) + "," + std::to_string(casterCamera.direction.y) + "]\n"
 						+  "fps = " + std::to_string((int)(1000.0f / msElapsed)));
 
 			window.draw(info);

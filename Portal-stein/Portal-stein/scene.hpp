@@ -33,6 +33,8 @@ namespace ps {
 		Scene();
 	};
 
+	using scenePtr = std::shared_ptr<Scene>;
+
 }
 
 #endif // !PS_SCENE_INCLUDED
