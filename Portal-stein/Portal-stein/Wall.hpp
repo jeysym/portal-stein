@@ -13,7 +13,6 @@ namespace ps {
 	class Wall {
 	public:
 		sf::Vector2f from, to;
-		float height = 1.0f;
 		std::unique_ptr<Portal> portal;
 
 		Wall(sf::Vector2f from_, sf::Vector2f to_);

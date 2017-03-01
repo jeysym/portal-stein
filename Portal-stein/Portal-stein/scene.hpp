@@ -10,6 +10,8 @@
 namespace ps {
 
 	struct Segment {
+		float segmentFloorHeight = 0.0f;
+		float segmentWallHeight = 1.0f;
 		floorPtr floor;
 		ceilingPtr ceiling;
 		std::vector<std::shared_ptr<Wall>> edges;
@@ -17,8 +19,16 @@ namespace ps {
 		Segment(floorPtr & floor_, ceilingPtr & ceiling_);
 	};
 	
-	struct Scene {
+	class Scene{
+	private:
 		std::vector<Segment> segments;
+
+	public:
+		// Adds a new segment. Its unique id is returned.
+		std::size_t addSegment(Segment segment_);
+
+		// Gets segment by its id.
+		Segment& getSegment(std::size_t segmentId);
 
 		Scene();
 	};

@@ -26,15 +26,15 @@ namespace ps {
 	{
 		// tries to find the edge in ray segment that ray intersects
 		WallIntersection intersection;
-		auto & segment = scene->segments[ray.segmentId];
+		auto & segment = scene->getSegment(ray.segmentId);
 		for (auto edge : segment.edges) {
 			if (edge->intersect(ray, intersection)) {
 				// ray hits this edge
 				Wall & hitEdge = *intersection.wallThatWasHit;
-				float d = dot(intersection.rayIntersectionDistance * ray.direction, camera.direction); // fishbowl effect will be removed
+				float distance = dot(intersection.rayIntersectionDistance * ray.direction, camera.direction); // fishbowl effect will be removed
 
-				float top = projectToScreen(hitEdge.height, d);
-				float bottom = projectToScreen(0.0f, d);
+				float top = projectToScreen(segment.segmentFloorHeight + segment.segmentWallHeight, distance);
+				float bottom = projectToScreen(segment.segmentFloorHeight, distance);
 				float scrTop = minimum(top, renderArea.top);
 				float scrBottom = maximum(bottom, renderArea.top + renderArea.height);
 
@@ -47,7 +47,7 @@ namespace ps {
 					renderPart(rt, edgeArea, ray);	// edge (segment behind it) is drawn
 				}
 				else {
-					float edgeWidth = 2.0f * d * tan(camera.hFOV / (2 * width));
+					float edgeWidth = 2.0f * distance * tan(camera.hFOV / (2 * width));
 					hitEdge.draw(rt, edgeArea, intersection.distanceToWallEdge, edgeWidth);
 				}
 

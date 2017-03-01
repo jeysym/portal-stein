@@ -36,8 +36,8 @@ namespace ps {
 		segment1.edges.push_back(std::make_shared<TexturedWall>(other, rb, metalTex));
 		segment1.edges.push_back(std::make_shared<ColoredWall>(rb, rt, sf::Color::White, door2));
 
-		scene->segments.push_back(segment0);
-		scene->segments.push_back(segment1);
+		scene->addSegment(segment0);
+		scene->addSegment(segment1);
 
 		return scene;
 	}
