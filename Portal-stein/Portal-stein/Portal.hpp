@@ -1,6 +1,7 @@
 #pragma once
 #ifndef PS_PORTAL_INCLUDED
 #define PS_PORTAL_INCLUDED
+#include <memory>
 #include "ObjectInScene.hpp"
 #include "SFML\Graphics.hpp"
 
@@ -9,6 +10,8 @@ namespace ps {
 	public:
 		virtual void stepThrough(ObjectInScene & obj) = 0;
 	};
+
+	using portalUPtr = std::unique_ptr<Portal>;
 
 	class Door : public Portal {
 	public:

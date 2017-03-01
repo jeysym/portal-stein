@@ -22,19 +22,16 @@ namespace ps {
 		floorPtr greyFloor = std::make_shared<ColoredFloor>(sf::Color{ 181, 179, 168 });
 		ceilingPtr ceiling = std::make_shared<ColoredCeiling>(sf::Color::Cyan);
 
-		std::unique_ptr<Portal> door1 = std::make_unique<Door>(1);
-		std::unique_ptr<Portal> door2 = std::make_unique<Door>(0);
-
 		Segment segment0{ floor, ceiling };
 		segment0.edges.push_back(std::make_shared<ColoredWall>(lt, rt, sf::Color::Blue));
-		segment0.edges.push_back(std::make_shared<ColoredWall>(rt, rb, sf::Color::White, door1));
+		segment0.edges.push_back(std::make_shared<DoorWall>(rt, rb, 1));
 		segment0.edges.push_back(std::make_shared<TexturedWall>(rb, lb, metalTex));
 		segment0.edges.push_back(std::make_shared<ColoredWall>(lb, lt, sf::Color::Yellow));
 
 		Segment segment1{ greyFloor, ceiling };
 		segment1.edges.push_back(std::make_shared<ColoredWall>(rt, other, sf::Color{ 242, 131, 5 }));
 		segment1.edges.push_back(std::make_shared<TexturedWall>(other, rb, metalTex));
-		segment1.edges.push_back(std::make_shared<ColoredWall>(rb, rt, sf::Color::White, door2));
+		segment1.edges.push_back(std::make_shared<DoorWall>(rb, rt, 0));
 
 		scene->addSegment(segment0);
 		scene->addSegment(segment1);

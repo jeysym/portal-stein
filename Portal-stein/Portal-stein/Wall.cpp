@@ -4,7 +4,9 @@
 namespace ps {
 	Wall::Wall(sf::Vector2f from_, sf::Vector2f to_) : from(from_), to(to_) { }
 
-	Wall::Wall(sf::Vector2f from_, sf::Vector2f to_, std::unique_ptr<Portal>& portal_) : from(from_), to(to_), portal(std::move(portal_)) { }
+	void Wall::setPortal(portalUPtr portal_) {
+		portal = std::move(portal_);
+	}
 
 	bool Wall::isPortal()
 	{
@@ -46,10 +48,6 @@ namespace ps {
 		drawRectangle.setFillColor(color_);
 	}
 
-	ColoredWall::ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal>& portal_) : Wall(from, to, portal_), drawRectangle() {
-		drawRectangle.setFillColor(color_);
-	}
-
 	void TexturedWall::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth)
 	{
 		drawRectangle.setSize(sf::Vector2f{ renderArea.width, renderArea.height });
@@ -64,9 +62,17 @@ namespace ps {
 		drawRectangle.setTexture(&texture);
 	}
 
-	TexturedWall::TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal>& portal_) : Wall(from, to, portal_), texture(texture_), drawRectangle() {
-		texture.setRepeated(true);
-		drawRectangle.setTexture(&texture);
+
+	DoorWall::DoorWall(sf::Vector2f from_, sf::Vector2f to_, std::size_t targetSegment_) : Wall(from_, to_) {
+		setPortal(std::make_unique<Door>(targetSegment_));
+	}
+
+	void DoorWall::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth) {
+		// DoorWall is not drawn
+	}
+
+	void WallPortalWall::draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth) {
+		// Wall portal wall is not drawn
 	}
 
 }

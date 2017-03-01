@@ -11,13 +11,14 @@ namespace ps {
 	struct WallIntersection;
 
 	class Wall {
-	public:
+	private:
 		sf::Vector2f from, to;
-		std::unique_ptr<Portal> portal;
+		portalUPtr portal;
 
+	public:
 		Wall(sf::Vector2f from_, sf::Vector2f to_);
-		Wall(sf::Vector2f from_, sf::Vector2f to_, std::unique_ptr<Portal> & portal_);
 
+		void setPortal(portalUPtr portal_);
 		bool isPortal();
 		void stepThrough(ObjectInScene & obj);
 		bool intersect(Ray ray, WallIntersection & intersection);
@@ -32,25 +33,38 @@ namespace ps {
 
 	class ColoredWall : public Wall {
 	public:
-		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
-
 		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
-		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
+
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
+	
 	private:
 		sf::RectangleShape drawRectangle;
 	};
 
 	class TexturedWall : public Wall {
 	public:
-		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
-
 		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
-		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);
+
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
+	
 	private:
 		sf::Texture texture;
 		sf::RectangleShape drawRectangle;
 	};
 
+	class DoorWall : public Wall {
+	public:
+		DoorWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment);
+
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
+	};
+
+	class WallPortalWall : public Wall {
+	public:
+		WallPortalWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment, sf::Vector2f targetFrom, sf::Vector2f targetTo);
+
+		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
+	};
 }
 
 #endif // !PS_EDGE_INCLUDED
