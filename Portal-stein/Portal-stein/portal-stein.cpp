@@ -46,10 +46,10 @@ namespace ps {
 		unsigned int wWidth = 800;
 		unsigned int wHeight = 600;
 
-		float walkSpeed = 1.8 / 1000.0;
-		float rotateSpeed = 1.5 / 1000.0;
-		float ascendSpeed = 1.2 / 1000.0;
-		float hFOV = (float)PI * 0.36f;
+		float walkSpeed = 1.8f / 1000.0f;
+		float rotateSpeed = 1.5f / 1000.0f;
+		float ascendSpeed = 1.2f / 1000.0f;
+		float hFOV = PI<float> * 0.36f;
 
 		
 
@@ -72,7 +72,7 @@ namespace ps {
 		while (window.isOpen())
 		{
 			// measure the time elapsed from the last draw
-			float msElapsed = clock.getElapsedTime().asMilliseconds();
+			float msElapsed = (float)clock.getElapsedTime().asMilliseconds();
 			clock.restart();
 
 			sf::Event event;

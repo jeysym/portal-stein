@@ -2,12 +2,12 @@
 #ifndef PS_RAYCASTER_INCLUDED
 #define PS_RAYCASTER_INCLUDED
 #include "Scene.hpp"
-#include "SceneObject.hpp"
+#include "ObjectInScene.hpp"
 #include <memory>
 #include <SFML\Graphics.hpp>
 
 namespace ps {
-	class Camera : public SceneHObject {
+	class Camera : public ObjectInScene {
 	public:
 
 		Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV, float aspectRatio);

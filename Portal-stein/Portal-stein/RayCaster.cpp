@@ -6,7 +6,7 @@ namespace ps {
 
 	void RayCaster::render(sf::RenderTarget & rt)
 	{
-		for (int i = 0; i < width; ++i) {
+		for (unsigned int i = 0; i < width; ++i) {
 			sf::FloatRect renderArea { sf::Vector2f{ (float)i, 0.0f }, sf::Vector2f{ 1.0f, (float)height } }; // stip of the screen that will be drawn
 
 			Ray ray = generateRay(i);
@@ -19,7 +19,7 @@ namespace ps {
 	{
 		float k = -1.0f + 1.0f / width + i * 2.0f / width; // just conversion from "i" in [0, width-1] to "k" in (-1, 1)
 		sf::Vector2f rayDir = camera.direction + k * camera.viewPlane;
-		return Ray{ camera.position, camera.height, rayDir , camera.segmentId };
+		return Ray{ camera.position, rayDir , camera.segmentId };
 	}
 
 	void RayCaster::renderPart(sf::RenderTarget & rt, sf::FloatRect renderArea, Ray ray)
@@ -68,13 +68,13 @@ namespace ps {
 
 	float RayCaster::projectToScreen(float hei, float distance)
 	{
-		float h = hei - camera.height;
+		float h = hei - camera.position.z;
 		float H = h * camera.viewPlaneHeight / distance;
 		float scrH = (H - camera.viewPlaneHeight) * ((float)height / (- 2.0f * camera.viewPlaneHeight));
 		return scrH;
 	}
 
-	Camera::Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV_, float aspectRatio) : viewPlane(), SceneHObject(origin, direction, segment)
+	Camera::Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV_, float aspectRatio) : viewPlane(), ObjectInScene(origin, direction, segment)
 	{
 		hFOV = hFOV_;
 		float c = cos(hFOV / 2);

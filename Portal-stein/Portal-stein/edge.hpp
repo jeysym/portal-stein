@@ -2,7 +2,7 @@
 #ifndef PS_EDGE_INCLUDED
 #define PS_EDGE_INCLUDED
 #include "Portal.hpp"
-#include "SceneObject.hpp"
+#include "ObjectInScene.hpp"
 #include <memory>
 #include <SFML\Graphics.hpp>
 
@@ -20,7 +20,7 @@ namespace ps {
 		Edge(sf::Vector2f from_, sf::Vector2f to_, std::unique_ptr<Portal> & portal_);
 
 		bool isPortal();
-		void stepThrough(SceneObject & obj);
+		void stepThrough(ObjectInScene & obj);
 		bool intersect(Ray ray, EdgeIntersection & intersection);
 		virtual void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth) = 0;
 	};

@@ -11,7 +11,7 @@ namespace ps {
 		return portal.get() != nullptr;
 	}
 
-	void Edge::stepThrough(SceneObject & obj)
+	void Edge::stepThrough(ObjectInScene & obj)
 	{
 		if (portal) {
 			portal->stepThrough(obj);
@@ -21,8 +21,9 @@ namespace ps {
 	bool Edge::intersect(Ray ray, EdgeIntersection & intersection)
 	{
 		sf::Vector2f solution;
+		sf::Vector2f rayPosition2D{ ray.position.x, ray.position.y };
 		float det = determinant(ray.direction, to - from);
-		bool solveable = solveLinEq(ray.direction, from - to, from - ray.position, solution);
+		bool solveable = solveLinEq(ray.direction, from - to, from - rayPosition2D, solution);
 		if (det >= 0 || solveable == false || solution.y < 0 || solution.y > 1 || solution.x <= 0) {
 			return false;
 		}

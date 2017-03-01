@@ -20,10 +20,6 @@ namespace ps {
 		direction.y = sin(angle) * x + cos(angle) * y;
 	}
 
-	void ObjectInScene::rotatePositionAround(float angle, sf::Vector2f center) {
-
-	}
-
 	void ObjectInScene::ascend(float distance) {
 		position.z += distance;
 	}

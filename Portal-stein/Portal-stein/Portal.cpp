@@ -4,7 +4,7 @@
 namespace ps {
 	Door::Door(std::size_t targetSegment_) : targetSegment(targetSegment_) {	}
 
-	void Door::stepThrough(SceneObject & obj)
+	void Door::stepThrough(ObjectInScene & obj)
 	{
 		obj.segmentId = targetSegment;
 	}
@@ -20,9 +20,8 @@ namespace ps {
 		rotationCentrum = a1;
 	}
 
-	void Teleport::stepThrough(SceneObject & obj)
+	void Teleport::stepThrough(ObjectInScene & obj)
 	{
-		obj.rotatePosAround(rotateAngle, rotationCentrum);
-		obj.move(move.x, move.y);
+		// TODO : make teleport work
 	}
 }

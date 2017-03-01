@@ -5,7 +5,8 @@
 #include <cmath>
 
 namespace ps {
-	const double PI = atan(1.0) * 4;
+	template<typename T>
+	const T PI = (T)(atan(1.0) * 4.0);
 
 	template<typename T>
 	inline void rotateVec2(sf::Vector2<T> & vector, float alpha) {
