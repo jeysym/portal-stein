@@ -154,7 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Edge.cpp" />
+    <ClCompile Include="Wall.cpp" />
     <ClCompile Include="FloorCeiling.cpp" />
     <ClCompile Include="portal-stein.cpp" />
     <ClCompile Include="Portal.cpp" />
@@ -163,7 +163,7 @@
     <ClCompile Include="ObjectInScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Edge.hpp" />
+    <ClInclude Include="Wall.hpp" />
     <ClInclude Include="FloorCeiling.hpp" />
     <ClInclude Include="Math.hpp" />
     <ClInclude Include="Portal.hpp" />

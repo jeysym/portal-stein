@@ -25,13 +25,13 @@ namespace ps {
 	void RayCaster::renderPart(sf::RenderTarget & rt, sf::FloatRect renderArea, Ray ray)
 	{
 		// tries to find the edge in ray segment that ray intersects
-		EdgeIntersection intersection;
+		WallIntersection intersection;
 		auto & segment = scene->segments[ray.segmentId];
 		for (auto edge : segment.edges) {
 			if (edge->intersect(ray, intersection)) {
 				// ray hits this edge
-				Edge & hitEdge = *intersection.hitEdge;
-				float d = dot(intersection.rayDist * ray.direction, camera.direction); // fishbowl effect will be removed
+				Wall & hitEdge = *intersection.wallThatWasHit;
+				float d = dot(intersection.rayIntersectionDistance * ray.direction, camera.direction); // fishbowl effect will be removed
 
 				float top = projectToScreen(hitEdge.height, d);
 				float bottom = projectToScreen(0.0f, d);
@@ -48,7 +48,7 @@ namespace ps {
 				}
 				else {
 					float edgeWidth = 2.0f * d * tan(camera.hFOV / (2 * width));
-					hitEdge.draw(rt, edgeArea, intersection.edgeDist, edgeWidth);
+					hitEdge.draw(rt, edgeArea, intersection.distanceToWallEdge, edgeWidth);
 				}
 
 				segment.floor->draw(rt, floorArea, sf::Vector2f{ 0.0f, 0.0f }, sf::Vector2f{ 0.0f, 0.0f }); // TODO: make floor & edge draw correctly (for textured floor)

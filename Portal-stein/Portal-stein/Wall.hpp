@@ -8,45 +8,45 @@
 
 namespace ps {
 
-	struct EdgeIntersection;
+	struct WallIntersection;
 
-	class Edge {
+	class Wall {
 	public:
 		sf::Vector2f from, to;
 		float height = 1.0f;
 		std::unique_ptr<Portal> portal;
 
-		Edge(sf::Vector2f from_, sf::Vector2f to_);
-		Edge(sf::Vector2f from_, sf::Vector2f to_, std::unique_ptr<Portal> & portal_);
+		Wall(sf::Vector2f from_, sf::Vector2f to_);
+		Wall(sf::Vector2f from_, sf::Vector2f to_, std::unique_ptr<Portal> & portal_);
 
 		bool isPortal();
 		void stepThrough(ObjectInScene & obj);
-		bool intersect(Ray ray, EdgeIntersection & intersection);
+		bool intersect(Ray ray, WallIntersection & intersection);
 		virtual void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth) = 0;
 	};
 
-	struct EdgeIntersection {
-		Edge * hitEdge;
-		float rayDist;
-		float edgeDist;
+	struct WallIntersection {
+		Wall * wallThatWasHit;
+		float rayIntersectionDistance;
+		float distanceToWallEdge;
 	};
 
-	class ColoredEdge : public Edge {
+	class ColoredWall : public Wall {
 	public:
 		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
 
-		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
-		ColoredEdge(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
+		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
+		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_, std::unique_ptr<Portal> & portal_);
 	private:
 		sf::RectangleShape drawRectangle;
 	};
 
-	class TexturedEdge : public Edge {
+	class TexturedWall : public Wall {
 	public:
 		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
 
-		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
-		TexturedEdge(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);
+		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
+		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_, std::unique_ptr<Portal> & portal_);
 	private:
 		sf::Texture texture;
 		sf::RectangleShape drawRectangle;

@@ -2,7 +2,7 @@
 #ifndef PS_SCENE_INCLUDED
 #define PS_SCENE_INCLUDED
 #include "FloorCeiling.hpp"
-#include "Edge.hpp"
+#include "Wall.hpp"
 #include <vector>
 #include <memory>
 #include <SFML\Graphics.hpp>
@@ -12,7 +12,7 @@ namespace ps {
 	struct Segment {
 		floorPtr floor;
 		ceilingPtr ceiling;
-		std::vector<std::shared_ptr<Edge>> edges;
+		std::vector<std::shared_ptr<Wall>> edges;
 
 		Segment(floorPtr & floor_, ceilingPtr & ceiling_);
 	};
