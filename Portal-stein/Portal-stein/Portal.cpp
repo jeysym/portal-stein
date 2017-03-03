@@ -1,27 +1,23 @@
 #include "Portal.hpp"
 #include "Math.hpp"
+#include "Geometry.hpp"
 
 namespace ps {
 	Door::Door(std::size_t targetSegment_) : targetSegment(targetSegment_) {	}
 
 	void Door::stepThrough(ObjectInScene & obj)
 	{
-		obj.segmentId = targetSegment;
+		obj.moveIntoSegment(targetSegment);
 	}
 
-	Teleport::Teleport(sf::Vector2f move_, float rotateAngle_, sf::Vector2f rotationCentrum_ ,std::size_t targetSegment_) : move(move_), rotateAngle(rotateAngle_), targetSegment(targetSegment_), rotationCentrum(rotationCentrum_) { }
 
-	Teleport::Teleport(sf::Vector2f a1, sf::Vector2f a2, sf::Vector2f b1, sf::Vector2f b2, std::size_t targetSegment_) : targetSegment(targetSegment_)
+
+	WallPortal::WallPortal(LineSegment from_, LineSegment to_, std::size_t targetSegment_) : from(from_), to(to_), targetSegment(targetSegment_) { }
+
+	void WallPortal::stepThrough(ObjectInScene & obj)
 	{
-		move = b1 - a1;
-		sf::Vector2f x = a2 - a1;
-		sf::Vector2f y = b2 - b1;
-		rotateAngle = angle(x, y);
-		rotationCentrum = a1;
+		LineSegment::mapLineSegments(from, to, obj);
+		obj.moveIntoSegment(targetSegment);
 	}
-
-	void Teleport::stepThrough(ObjectInScene & obj)
-	{
-		// TODO : make teleport work
-	}
+	
 }

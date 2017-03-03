@@ -1,10 +1,11 @@
 #pragma once
 #ifndef PS_EDGE_INCLUDED
 #define PS_EDGE_INCLUDED
-#include "Portal.hpp"
-#include "ObjectInScene.hpp"
 #include <memory>
 #include <SFML\Graphics.hpp>
+#include "Portal.hpp"
+#include "ObjectInScene.hpp"
+#include "Geometry.hpp"
 
 namespace ps {
 
@@ -12,13 +13,13 @@ namespace ps {
 
 	class Wall {
 	private:
-		sf::Vector2f from, to;
+		LineSegment lineSegment;
 		portalUPtr portal;
 
 	public:
 		Wall(sf::Vector2f from_, sf::Vector2f to_);
 
-		void setPortal(portalUPtr portal_);
+		void setPortal(portalUPtr & portal_);
 		bool isPortal();
 		void stepThrough(ObjectInScene & obj);
 		bool intersect(Ray ray, WallIntersection & intersection);
@@ -61,7 +62,7 @@ namespace ps {
 
 	class WallPortalWall : public Wall {
 	public:
-		WallPortalWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment, sf::Vector2f targetFrom, sf::Vector2f targetTo);
+		WallPortalWall(LineSegment wallFrom, LineSegment wallTo, std::size_t targetSegment_);
 
 		void draw(sf::RenderTarget & rt, sf::FloatRect renderArea, float edgeDist, float edgeWidth);
 	};

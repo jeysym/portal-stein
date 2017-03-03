@@ -1,42 +1,50 @@
 #include <SFML/Graphics.hpp>
 #include "RayCaster.hpp"
 #include "Math.hpp"
+#include "FloorCeiling.hpp"
 
 namespace ps {
 
 	std::shared_ptr<Scene> makeTestScene() {
+		auto result = std::make_shared<Scene>();
+
 		sf::Texture wallTex;
 		wallTex.loadFromFile("H:\\MyData\\Textures\\wall.bmp");
 		sf::Texture metalTex;
 		metalTex.loadFromFile("H:\\MyData\\Textures\\metal.bmp");
+		sf::Texture floorTex;
+		floorTex.loadFromFile("H:\\MyData\\Textures\\floor.bmp");
+		
+		floorPtr floor = std::make_shared<ColoredFloor>( sf::Color::Green );
+		ceilingPtr ceiling = std::make_shared<ColoredCeiling>( sf::Color::Cyan );
 
-		sf::Vector2f lt{ -2.0f, 2.0f };
-		sf::Vector2f lb{ -2.0f, -2.0f };
-		sf::Vector2f rt{ 2.0f, 2.0f };
-		sf::Vector2f rb{ 2.0f, -2.0f };
+		sf::Vector2f a{ 0.0f, 0.0f };
+		sf::Vector2f b{ 0.0f, 5.0f };
+		sf::Vector2f c{ 5.0f, 5.0f };
+		sf::Vector2f d{ 5.0f, 0.0f };
 
-		sf::Vector2f other{ 5.0f, 0.0f };
+		sf::Vector2f offset{ 10.0, 0.0 };
+		sf::Vector2f e = a + offset;
+		sf::Vector2f f = b + offset;
+		sf::Vector2f g = c + offset;
+		sf::Vector2f h = d + offset;
 
-		auto scene = std::make_shared<Scene>();
-		floorPtr floor = std::make_shared<ColoredFloor>(sf::Color::Green);
-		floorPtr greyFloor = std::make_shared<ColoredFloor>(sf::Color{ 181, 179, 168 });
-		ceilingPtr ceiling = std::make_shared<ColoredCeiling>(sf::Color::Cyan);
+		Segment room0{ floor, ceiling };
+		room0.edges.push_back(std::make_unique<TexturedWall>(d, a, wallTex));
+		room0.edges.push_back(std::make_unique<TexturedWall>(a, b, wallTex));
+		room0.edges.push_back(std::make_unique<TexturedWall>(b, c, wallTex));
+		room0.edges.push_back(std::make_unique<WallPortalWall>(LineSegment{ c, d }, LineSegment{ g, f }, 1));
 
-		Segment segment0{ floor, ceiling };
-		segment0.edges.push_back(std::make_shared<ColoredWall>(lt, rt, sf::Color::Blue));
-		segment0.edges.push_back(std::make_shared<DoorWall>(rt, rb, 1));
-		segment0.edges.push_back(std::make_shared<TexturedWall>(rb, lb, metalTex));
-		segment0.edges.push_back(std::make_shared<ColoredWall>(lb, lt, sf::Color::Yellow));
+		Segment room1{ floor, ceiling };
+		room1.edges.push_back(std::make_unique<TexturedWall>(e, f, metalTex));
+		room1.edges.push_back(std::make_unique<TexturedWall>(g, h, metalTex));
+		room1.edges.push_back(std::make_unique<TexturedWall>(h, e, metalTex));
+		room1.edges.push_back(std::make_unique<DoorWall>(e, f, 0));
 
-		Segment segment1{ greyFloor, ceiling };
-		segment1.edges.push_back(std::make_shared<ColoredWall>(rt, other, sf::Color{ 242, 131, 5 }));
-		segment1.edges.push_back(std::make_shared<TexturedWall>(other, rb, metalTex));
-		segment1.edges.push_back(std::make_shared<DoorWall>(rb, rt, 0));
+		result->addSegment(room0);
+		result->addSegment(room1);
 
-		scene->addSegment(segment0);
-		scene->addSegment(segment1);
-
-		return scene;
+		return result;
 	}
 
 	int main() {
@@ -50,7 +58,7 @@ namespace ps {
 
 		
 
-		Camera camera{ sf::Vector3f{0.0f, 0.0f, 0.1f}, sf::Vector2f{0.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
+		Camera camera{ sf::Vector3f{4.0f, 1.0f, 0.1f}, sf::Vector2f{ 1.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
 		auto scene = makeTestScene();
 
 		RayCaster caster{ camera };
@@ -110,9 +118,16 @@ namespace ps {
 			window.clear(sf::Color::Black);
 
 			caster.render(window);
-			info.setString("pos = [" + std::to_string(casterCamera.position.x) + "," + std::to_string(casterCamera.position.y) + "]\n"
-						+  "dir = [" + std::to_string(casterCamera.direction.x) + "," + std::to_string(casterCamera.direction.y) + "]\n"
-						+  "fps = " + std::to_string((int)(1000.0f / msElapsed)));
+
+			auto position = casterCamera.getPosition();
+			auto direction = casterCamera.getDirection();
+			auto segmentId = casterCamera.getSegmentId();
+			info.setString(
+				"pos = [" + std::to_string(position.x) + "," + std::to_string(position.y) + "]\n" + 
+				"dir = [" + std::to_string(direction.x) + "," + std::to_string(direction.y) + "]\n" + 
+				"segment = " + std::to_string(segmentId) + "\n" + 
+				"fps = " + std::to_string((int)(1000.0f / msElapsed))
+			);
 
 			window.draw(info);
 

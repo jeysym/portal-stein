@@ -36,6 +36,9 @@
     <ClCompile Include="Wall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RayCaster.hpp">
@@ -56,10 +59,13 @@
     <ClInclude Include="ObjectInScene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Transformation.hpp">
+    <ClInclude Include="Wall.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wall.hpp">
+    <ClInclude Include="Geometry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Solve.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

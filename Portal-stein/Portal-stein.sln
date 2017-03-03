@@ -5,6 +5,11 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Portal-stein", "Portal-stein\Portal-stein.vcxproj", "{075BC732-C779-4D74-B99B-C9388B84F3A8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Portal-steinTest", "Portal-steinTest\Portal-steinTest.vcxproj", "{1D7DD7E3-C235-471E-930C-8E62C5265F99}"
+	ProjectSection(ProjectDependencies) = postProject
+		{075BC732-C779-4D74-B99B-C9388B84F3A8} = {075BC732-C779-4D74-B99B-C9388B84F3A8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +26,14 @@ Global
 		{075BC732-C779-4D74-B99B-C9388B84F3A8}.Release|x64.Build.0 = Release|x64
 		{075BC732-C779-4D74-B99B-C9388B84F3A8}.Release|x86.ActiveCfg = Release|Win32
 		{075BC732-C779-4D74-B99B-C9388B84F3A8}.Release|x86.Build.0 = Release|Win32
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Debug|x64.ActiveCfg = Debug|x64
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Debug|x64.Build.0 = Debug|x64
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Debug|x86.ActiveCfg = Debug|Win32
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Debug|x86.Build.0 = Debug|Win32
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Release|x64.ActiveCfg = Release|x64
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Release|x64.Build.0 = Release|x64
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Release|x86.ActiveCfg = Release|Win32
+		{1D7DD7E3-C235-471E-930C-8E62C5265F99}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

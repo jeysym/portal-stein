@@ -12,7 +12,7 @@ namespace ps {
 
 		Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment, float hFOV, float aspectRatio);
 
-		void rotate(float angle);
+		virtual void rotate(float angle);
 
 		sf::Vector2f viewPlane;
 		float viewPlaneHeight;

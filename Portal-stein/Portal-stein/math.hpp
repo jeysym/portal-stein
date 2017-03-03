@@ -3,19 +3,64 @@
 
 #include <SFML\Graphics.hpp>
 #include <cmath>
+#include <cassert>
 
 namespace ps {
-	template<typename T>
+
+	// *******************
+	// DECLARATIONS
+	// *******************
+
+	// Template Pi (3.1415...) constant.
+	template< typename T >
 	const T PI = (T)(atan(1.0) * 4.0);
 
-	template<typename T>
-	inline void rotateVec2(sf::Vector2<T> & vector, float alpha) {
-		vector.x = cos(alpha) * vector.x - sin(alpha) * vector.y;
-		vector.y = sin(alpha) * vector.x + cos(alpha) * vector.y;
-	}
+	// Rotates 2D vector by desired angle (in radians).
+	template< typename T >
+	inline void rotate(sf::Vector2<T> & vector, T angle);
+
+	// Dot product of two 2D vectors.
+	template< typename T>
+	inline T dot(const sf::Vector2<T> & a, const sf::Vector2<T> & b);
+
+	// Computes the (euclidian) norm of the vector.
+	template< typename T>
+	inline T norm(const sf::Vector2<T> & vector);
+
+	// Computes the angle between two 2D vectors.
+	template< typename T >
+	inline T angleBetween(const sf::Vector2<T> & vectorA, const sf::Vector2<T> & vectorB);
+
+	// Returns normalized version of the 2D vector.
+	template< typename T >
+	inline sf::Vector2<T> normalized(const sf::Vector2<T> & vector);
+
+	// Normalizes the 2D vector.
+	template< typename T >
+	inline void normalize(sf::Vector2<T> & vector);
+
+	// Cross product of two 2D vectors.
+	template< typename T >
+	inline T cross(const sf::Vector2<T> & a, const sf::Vector2<T> & b);
+
+	// Cross product of two 3D vectors. 
+	template< typename T>
+	inline sf::Vector3<T> cross(const sf::Vector3<T> & a, const sf::Vector3<T> & b);
+
+	// Returns maximal out of two arguments.
+	template< typename T >
+	inline const T& getMax(const T & a, const T & b);
+
+	// Returns minimal out of two arguments.
+	template< typename T >
+	inline const T& getMin(const T & a, const T & b);
+
+	// *********************
+	// DEFINITIONS 
+	// *********************
 
 	template<typename T>
-	inline sf::Vector3<T> cross(sf::Vector3<T> a, sf::Vector3<T> b) {
+	inline sf::Vector3<T> cross(const sf::Vector3<T> & a, const sf::Vector3<T> & b) {
 		sf::Vector3<T> result;
 
 		result.x = a.y * b.z - a.z * b.y;
@@ -26,63 +71,78 @@ namespace ps {
 	}
 
 	template<typename T>
-	inline T dot(sf::Vector2<T> & a, sf::Vector2<T> & b) {
-		return a.x * b.x + a.y * b.y;
+	const T& getMax(const T & a, const T & b)
+	{
+		return (a < b) ? b : a;
 	}
 
 	template<typename T>
-	inline T norm(sf::Vector2<T> & vector) {
-		return sqrt(dot(vector, vector));
-	}
-
-	template<typename T>
-	inline sf::Vector2<T> normalize(sf::Vector2<T> & vector) {
-		T n = norm(vector);
-		vector.x /= n;
-		vector.y /= n;
-		return vector;
-	}
-
-	template<typename T>
-	inline T angle(sf::Vector2<T> & a, sf::Vector2<T> & b) {
-		return acos(dot(a, b) / (norm(a) * norm(b)));
-	}
-
-	template<typename T>
-	inline T determinant(sf::Vector2<T> & a, sf::Vector2<T> & b) {
-		return a.x * b.y - a.y * b.x;
-	}
-
-	// Solves equation of type (a|b)*solution = c
-	template<typename T>
-	inline bool solveLinEq(sf::Vector2<T> & a, sf::Vector2<T> & b, sf::Vector2<T> & c, sf::Vector2<T> & solution) {
-		// using Cramer's rule
-		T det = determinant(a, b);
-		if (det == 0) {
-			// no solution (or infinitely many)
-			return false;
-		}
-		else {
-			solution.x = determinant(c, b) / det;
-			solution.y = determinant(a, c) / det;
-			return true;
-		}
-	}
-
-	template<typename T>
-	inline sf::Vector2<T> getPerpendicular(sf::Vector2<T> & vector) {
-		return sf::Vector2<T> {vector.y, -vector.x};
-	}
-
-	template<typename T>
-	inline T minimum(T a, T b) {
+	const T& getMin(const T & a, const T & b)
+	{
 		return (a < b) ? a : b;
 	}
 
 	template<typename T>
-	inline T maximum(T a, T b) {
-		return (a > b) ? a : b;
+	T angleBetween(const sf::Vector2<T>& vectorA, const sf::Vector2<T>& vectorB)
+	{
+		float cosValue = dot(vectorA, vectorB) / (norm(vectorA) * norm(vectorB));
+		return acos(cosValue);
 	}
+
+	template<typename T>
+	void rotate(sf::Vector2<T> & vector, T angle)
+	{
+		T x = vector.x;
+		T y = vector.y;
+		vector.x = cos(angle) * x - sin(angle) * y;
+		vector.y = sin(angle) * x + cos(angle) * y;
+	}
+
+	template<typename T>
+	inline T dot(const sf::Vector2<T> & a, const sf::Vector2<T> & b) {
+		return a.x * b.x + a.y * b.y;
+	}
+
+	template<typename T>
+	inline T norm(const sf::Vector2<T> & vector) {
+		return sqrt(dot(vector, vector));
+	}
+
+	template<typename T>
+	sf::Vector2<T> normalized(const sf::Vector2<T>& vector)
+	{
+		sf::Vector2<T> result;
+		T normValue = norm(vector);
+		
+		if (normValue == 0) {
+			// Zero vector cannot be normalized...
+			// TODO : maybe exception would be better...
+			assert(false);
+		}
+		
+		result = (1 / normValue) * vector;
+		return result;
+	}
+
+	template<typename T>
+	void normalize(sf::Vector2<T>& vector)
+	{
+		T normValue = norm(vector);
+
+		if (normValue == 0) {
+			// TODO : add exception here
+			assert(false);
+		}
+
+		vector *= (1 / normValue);
+	}
+
+	template<typename T>
+	T cross(const sf::Vector2<T> & a, const sf::Vector2<T> & b)
+	{
+		return a.x * b.y - a.y * b.x;
+	}
+
 }
 
 #endif // !PS_MATH_INCLUDED

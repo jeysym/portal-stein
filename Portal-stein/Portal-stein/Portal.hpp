@@ -4,6 +4,7 @@
 #include <memory>
 #include "ObjectInScene.hpp"
 #include "SFML\Graphics.hpp"
+#include "Geometry.hpp"
 
 namespace ps {
 	class Portal {
@@ -23,18 +24,17 @@ namespace ps {
 		std::size_t targetSegment;
 	};
 
-	class Teleport : public Portal {
+	class WallPortal : public Portal {
+	private:
+		std::size_t targetSegment;
+		LineSegment from;
+		LineSegment to;
+
 	public:
-		Teleport(sf::Vector2f move_, float rotateAngle_, sf::Vector2f rotationCentrum, std::size_t targetSegment_);
-		Teleport(sf::Vector2f a1, sf::Vector2f a2, sf::Vector2f b1, sf::Vector2f b2, std::size_t targetSegment_);
+		WallPortal(LineSegment from_, LineSegment to_, std::size_t targetSegment_);
 
 		void stepThrough(ObjectInScene & obj);
 
-	private:
-		std::size_t targetSegment;
-		sf::Vector2f move;
-		sf::Vector2f rotationCentrum;
-		float rotateAngle;
 	};
 }
 
