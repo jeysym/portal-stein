@@ -46,7 +46,7 @@ namespace ps {
 		sf::Vector2<T> solution;
 	};
 
-	// Solves linear equations in form matrix * x = b.
+	// Solves linear equations in form matrix * x = b. (By using Cramer's rule)
 	template< typename T >
 	inline Solution<T> linearSolve(const Matrix2<T> & matrix, const sf::Vector2<T> & b);
 
