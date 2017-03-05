@@ -31,15 +31,16 @@ namespace ps {
 
 		Segment room0{ floor, ceiling };
 		room0.edges.push_back(std::make_unique<TexturedWall>(d, a, wallTex));
-		room0.edges.push_back(std::make_unique<TexturedWall>(a, b, wallTex));
-		room0.edges.push_back(std::make_unique<TexturedWall>(b, c, wallTex));
+		room0.edges.push_back(std::make_unique<ColoredWall>(a, b, sf::Color::Blue));
+		room0.edges.push_back(std::make_unique<ColoredWall>(b, c, sf::Color::Red));
 		room0.edges.push_back(std::make_unique<WallPortalWall>(LineSegment{ c, d }, LineSegment{ g, f }, 1));
 
 		Segment room1{ floor, ceiling };
 		room1.edges.push_back(std::make_unique<TexturedWall>(e, f, metalTex));
-		room1.edges.push_back(std::make_unique<TexturedWall>(g, h, metalTex));
-		room1.edges.push_back(std::make_unique<TexturedWall>(h, e, metalTex));
-		room1.edges.push_back(std::make_unique<DoorWall>(e, f, 0));
+		//room1.edges.push_back(std::make_unique<TexturedWall>(f, g, metalTex));
+		room1.edges.push_back(std::make_unique<WallPortalWall>(LineSegment{ f, g }, LineSegment{ d, c }, 0));
+		room1.edges.push_back(std::make_unique<ColoredWall>(g, h, sf::Color::Yellow));
+		room1.edges.push_back(std::make_unique<ColoredWall>(h, e, sf::Color::Magenta));
 
 		result->addSegment(room0);
 		result->addSegment(room1);
@@ -51,20 +52,15 @@ namespace ps {
 		unsigned int wWidth = 800;
 		unsigned int wHeight = 600;
 
-		float walkSpeed = 1.8f / 1000.0f;
-		float rotateSpeed = 1.5f / 1000.0f;
+		float walkSpeed = 3.8f / 1000.0f;
+		float rotateSpeed = 2.5f / 1000.0f;
 		float ascendSpeed = 1.2f / 1000.0f;
-		float hFOV = PI<float> * 0.36f;
 
-		
-
-		Camera camera{ sf::Vector3f{4.0f, 1.0f, 0.1f}, sf::Vector2f{ 1.0f, -1.0f}, 0, hFOV, (float)wWidth/(float)wHeight };
+		Camera camera{ sf::Vector3f{4.0f, 1.0f, 0.1f}, sf::Vector2f{ 1.0f, -1.0f}, 0 };
 		auto scene = makeTestScene();
 
 		RayCaster caster{ camera };
 		caster.setScene(scene);
-
-		Camera & casterCamera = caster.getCamera();
 
 		sf::RenderWindow window{ sf::VideoMode{wWidth, wHeight}, "Portal-stein" };
 		window.setVerticalSyncEnabled(true);
@@ -94,22 +90,22 @@ namespace ps {
 				if (event.type == sf::Event::KeyPressed) {
 					switch (event.key.code) {
 					case sf::Keyboard::W:
-						casterCamera.goForward(walkSpeed * msElapsed);
+						caster.goForwardCamera(walkSpeed * msElapsed);
 						break;
 					case sf::Keyboard::S:
-						casterCamera.goForward(-walkSpeed * msElapsed);
+						caster.goForwardCamera(-walkSpeed * msElapsed);
 						break;
 					case sf::Keyboard::A:
-						casterCamera.rotate(rotateSpeed * msElapsed);
+						caster.rotateCamera(rotateSpeed * msElapsed);
 						break;
 					case sf::Keyboard::D:
-						casterCamera.rotate(-rotateSpeed * msElapsed);
+						caster.rotateCamera(-rotateSpeed * msElapsed);
 						break;
 					case sf::Keyboard::Q:
-						casterCamera.ascend(ascendSpeed * msElapsed);
+						caster.ascendCamera(ascendSpeed * msElapsed);
 						break;
 					case sf::Keyboard::E:
-						casterCamera.ascend(-ascendSpeed * msElapsed);
+						caster.ascendCamera(-ascendSpeed * msElapsed);
 						break;
 					}
 				}
@@ -119,9 +115,9 @@ namespace ps {
 
 			caster.render(window);
 
-			auto position = casterCamera.getPosition();
-			auto direction = casterCamera.getDirection();
-			auto segmentId = casterCamera.getSegmentId();
+			auto position = caster.camera.getPosition();
+			auto direction = caster.camera.getDirection();
+			auto segmentId = caster.camera.getSegmentId();
 			info.setString(
 				"pos = [" + std::to_string(position.x) + "," + std::to_string(position.y) + "]\n" + 
 				"dir = [" + std::to_string(direction.x) + "," + std::to_string(direction.y) + "]\n" + 

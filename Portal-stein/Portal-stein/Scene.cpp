@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string>
 #include "Scene.hpp"
 
 namespace ps {
@@ -16,7 +17,16 @@ namespace ps {
 			return segments[segmentId];
 		}
 		else {
-			assert(false);
+			// this id correspond to no segment => throw expection
+			throw SegmentNotFound(segmentId);
 		}
+	}
+
+	SegmentNotFound::SegmentNotFound(std::size_t segmentId_) {
+		description = "Segment with id = " + std::to_string(segmentId_) + " was not found!";
+	}
+
+	const char * SegmentNotFound::what() const {
+		return description.c_str();
 	}
 }

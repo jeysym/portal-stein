@@ -30,15 +30,15 @@ namespace ps {
 
 	// Portal that connects two 2D line segments. 
 	class WallPortal : public Portal {
-	public:
-		WallPortal(LineSegment from_, LineSegment to_, std::size_t targetSegment_);
-
-		void stepThrough(ObjectInScene & obj);
-
 	private:
 		std::size_t targetSegment;
 		LineSegment from;
 		LineSegment to;
+
+	public:
+		WallPortal(LineSegment from_, LineSegment to_, std::size_t targetSegment_);
+
+		void stepThrough(ObjectInScene & obj);
 	};
 }
 

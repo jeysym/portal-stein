@@ -34,7 +34,7 @@ namespace ps {
 		// Gets the ending point of line segment.
 		sf::Vector2f getTo() const;
 
-		// Maps object from one line segment to another.
+		// Maps object from one line segment to another. If line segments have different lengths direction may be mapped inaccurately.
 		static void mapLineSegments(const LineSegment & a, const LineSegment & b, ObjectInScene & obj);
 	};
 

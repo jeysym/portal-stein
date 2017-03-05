@@ -16,29 +16,32 @@ namespace ps {
 
 	void LineSegment::mapLineSegments(const LineSegment & a, const LineSegment & b, ObjectInScene & obj)
 	{
-		// TODO : doesn't handle mapping of the direction when line segment is scaled
 		auto aDirection = a.to - a.from;
 		auto bDirection = b.to - b.from;
 		float aSegmentLength = norm(aDirection);
 		float bSegmentLength = norm(bDirection);
-		float angleFromAtoB = angleBetween(aDirection, bDirection);
+
 		float angleOfA = angleBetween(aDirection, sf::Vector2f{ 1.0f, 0.0f });
+		float angleFromAtoB = angleBetween(aDirection, bDirection);
 
-		sf::Vector2f position2D{ obj.position.x, obj.position.y };
+		sf::Vector2f position2D = toVector2(obj.getPosition());
 
-		// TODO : this all looks awful, make it pretty
 		position2D -= a.from;					// move a.from to origin
 
-		ps::rotate(position2D, -angleOfA);
-		position2D.x *= (bSegmentLength / aSegmentLength);
-		ps::rotate(position2D, angleOfA);
+		ps::rotate(position2D, angleOfA);					// rotate a.direction to positive x-axis
+		position2D.x *= (bSegmentLength / aSegmentLength);	// scale by desired amount the x coordinate
+		ps::rotate(position2D, -angleOfA);					// rotate a.direction back
 
-		ps::rotate(position2D, -angleFromAtoB);	// rotate by desired angle
-		position2D += b.from;					// move origin to b.from
+		ps::rotate(position2D, angleFromAtoB);				// rotate by desired angle
+		position2D += b.from;								// move origin to b.from
 
-		auto offset = position2D - sf::Vector2f{ obj.position.x, obj.position.y };
-		obj.rotate(-angleFromAtoB);
-		obj.move(offset);
+		// This whole tranformation can be expressed as move + rotation
+		sf::Vector2f finalOffset = position2D - sf::Vector2f{ obj.position.x, obj.position.y };
+		float finalRotation = angleFromAtoB;
+
+		// Apply the actual transformation to object.
+		obj.move(finalOffset);
+		obj.rotate(finalRotation);
 	}
 
 	RayLineSegmentIntersection intersect(const Ray & ray, const LineSegment & lineSegment)

@@ -15,6 +15,10 @@ namespace ps {
 	template< typename T >
 	const T PI = (T)(atan(1.0) * 4.0);
 
+	// Converts 3D vector to 2D vector by discarding the z cooridinate.
+	template< typename T >
+	inline sf::Vector2<T> toVector2(const sf::Vector3<T> & vector);
+
 	// Rotates 2D vector by desired angle (in radians).
 	template< typename T >
 	inline void rotate(sf::Vector2<T> & vector, T angle);
@@ -27,7 +31,8 @@ namespace ps {
 	template< typename T>
 	inline T norm(const sf::Vector2<T> & vector);
 
-	// Computes the angle between two 2D vectors.
+	// Computes the relative angle difference between two 2D vectors. Following invariant holds :
+	// rotate(x, angleBetween(x, y)) == y, where norm(x) == norm(y)
 	template< typename T >
 	inline T angleBetween(const sf::Vector2<T> & vectorA, const sf::Vector2<T> & vectorB);
 
@@ -85,8 +90,16 @@ namespace ps {
 	template<typename T>
 	T angleBetween(const sf::Vector2<T>& vectorA, const sf::Vector2<T>& vectorB)
 	{
-		float cosValue = dot(vectorA, vectorB) / (norm(vectorA) * norm(vectorB));
-		return acos(cosValue);
+		T aAngle = atan2(vectorA.y, vectorA.x);
+		T bAngle = atan2(vectorB.y, vectorB.x);
+
+		return bAngle - aAngle;
+	}
+
+	template<typename T>
+	sf::Vector2<T> toVector2(const sf::Vector3<T>& vector)
+	{
+		return sf::Vector2<T>(vector.x, vector.y);
 	}
 
 	template<typename T>
