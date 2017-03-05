@@ -16,6 +16,15 @@ TEST(MathTest, RoatateTest) {
 	EXPECT_VEC2NEAR(expected1, x, 0.01);
 }
 
+TEST(MathTest, AngleBetweenTest) {
+	sf::Vector2f x{ 2.0f, 3.0f };
+	sf::Vector2f y{ -3.0f, -2.0f };
+
+	rotate(x, angleBetween(x, y));
+
+	EXPECT_VEC2NEAR(y, x, 0.01);
+}
+
 TEST(MathTest, DotTest) {
 	sf::Vector2f zero{ 0.0f, 0.0f };
 	sf::Vector2f a{ 1.0f, 2.0f };

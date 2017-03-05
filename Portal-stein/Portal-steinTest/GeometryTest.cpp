@@ -64,7 +64,7 @@ TEST_F(GeometryTest, RayLSIntersection3) {
 	ASSERT_FALSE(intersection.theyIntersect) << "Ray intersects line segment opposite of the ray direction!";
 }
 
-TEST_F(GeometryTest, MapLSTest0) {
+TEST_F(GeometryTest, MapLSTestRightAngleRotation) {
 	ObjectInScene x{ sf::Vector3f{ 0.0f, 1.0f, 0.0f }, sf::Vector2f{ 0.0f, 1.0f }, 0 };
 	ObjectInScene y{ sf::Vector3f{ 1.0f, 0.0f, 1.0f }, sf::Vector2f{ 0.0f, -1.0f }, 1 };
 	ObjectInScene z{ sf::Vector3f{ 2.0f, 2.0f, 3.0f }, sf::Vector2f{ 1.0f, 0.0f }, 2 };
@@ -85,15 +85,27 @@ TEST_F(GeometryTest, MapLSTest0) {
 	EXPECT_EQ(2, z.getSegmentId());
 }
 
-TEST_F(GeometryTest, MapLSTest1) {
+TEST_F(GeometryTest, MapLSTestNoRotation) {
 	ObjectInScene x{ sf::Vector3f{ 0.0f, 0.0f, 0.0f }, sf::Vector2f{ 1.0f, 0.0f }, 0 };
 
 	LineSegment from{ sf::Vector2f{1.0f, 0.0f}, sf::Vector2f{1.0f, 4.0f} };
 	LineSegment to{ sf::Vector2f{5.0f, 1.0f}, sf::Vector2f{5.0, 5.0} };
 
 	LineSegment::mapLineSegments(from, to, x);
-	EXPECT_EQ(sf::Vector3f(4.0f, 1.0f, 0.0f), x.getPosition());
-	EXPECT_EQ(sf::Vector2f(1.0f, 0.0f), x.getDirection());
+	EXPECT_VEC3NEAR(sf::Vector3f(4.0f, 1.0f, 0.0f), x.getPosition(), 0.01);
+	EXPECT_VEC2NEAR(sf::Vector2f(1.0f, 0.0f), x.getDirection(), 0.01);
+	EXPECT_EQ(0, x.getSegmentId());
+}
+
+TEST_F(GeometryTest, MapLSTestNegativeRightAngleRotation) {
+	ObjectInScene x{ sf::Vector3f{ 5.0f, 1.0f, 0.0f }, sf::Vector2f{ 0.0f, 1.0f}, 0 };
+
+	LineSegment from{ sf::Vector2f{4.0f, 3.0f}, sf::Vector2f{7.0f, 3.0f} };
+	LineSegment to{ sf::Vector2f{0.0f, 0.0f}, sf::Vector2f{0.0f, 3.0f} };
+
+	LineSegment::mapLineSegments(from, to, x);
+	EXPECT_VEC3NEAR(sf::Vector3f(2.0f, 1.0f, 0.0f), x.getPosition(), 0.01);
+	EXPECT_VEC2NEAR(sf::Vector2f(-1.0f, 0.0f), x.getDirection(), 0.01);
 	EXPECT_EQ(0, x.getSegmentId());
 }
 
