@@ -19,10 +19,10 @@ namespace ps {
 		camera = camera_;
 	}
 
-	void RayCaster::goForwardCamera(float distance)
+	void RayCaster::moveCamera(sf::Vector3f offset)
 	{
 		auto oldCameraPosition = camera.getPosition();
-		camera.goForward(distance);
+		camera.move(offset);
 		auto newCameraPosition = camera.getPosition();
 		LineSegment cameraLS{ toVector2(oldCameraPosition), toVector2(newCameraPosition) };
 
@@ -41,6 +41,11 @@ namespace ps {
 				}
 			}
 		}
+	}
+
+	void RayCaster::goForwardCamera(float distance)
+	{
+		moveCamera(distance * toVector3(camera.getDirection()));
 	}
 
 	void RayCaster::ascendCamera(float distance)
@@ -114,33 +119,65 @@ namespace ps {
 			if (edge->intersect(ray, intersection)) {
 				// ray hits this edge
 				Wall & hitEdge = *intersection.wallThatWasHit;
-				float distance = intersection.rayIntersectionDistance * ray.correctionFactor;
+				float distance = intersection.rayIntersectionDistance;
+				float correctedDistance = distance * ray.correctionFactor;
 
-				float top = projectToScreen(segment.segmentFloorHeight + segment.segmentWallHeight, distance);
-				float bottom = projectToScreen(segment.segmentFloorHeight, distance);
-				float scrTop = getMin(top, renderArea.top);
-				float scrBottom = getMax(bottom, renderArea.top + renderArea.height);
+				float wallTopHeight = segment.segmentFloorHeight + segment.segmentWallHeight;
+				float wallBottomHeight = segment.segmentFloorHeight;
 
-				sf::FloatRect edgeArea{ renderArea.left, top, 1.0f, bottom - top };
-				sf::FloatRect ceilingArea{ renderArea.left, scrTop, 1.0f, top - scrTop };
-				sf::FloatRect floorArea{ renderArea.left, bottom, 1.0f, scrBottom - bottom };
+				float vpWallTop = distanceToViewPlane(correctedDistance, wallTopHeight);
+				float vpWallBottom = distanceToViewPlane(correctedDistance, wallBottomHeight);
+
+				float scrWallTop = viewPlaneToScreen(vpWallTop);
+				float scrWallBottom = viewPlaneToScreen(vpWallBottom);
+				float scrWallHeight = scrWallBottom - scrWallTop;
+
+				sf::FloatRect wallScreenArea{ renderArea.left, scrWallTop, 1.0f, scrWallHeight };
 
 				if (hitEdge.isPortal()) {
-					RayWithFishbowlCorrection rayCopy = ray;				// get a copy of the viewing ray
-					hitEdge.stepThrough(rayCopy);							// copy of ray steps through portal
-					renderPart(edgeArea, rayCopy, recursionDepth + 1);		// edge (segment behind it) is drawn
+					RayWithFishbowlCorrection rayCopy = ray;						// get a copy of the viewing ray
+					hitEdge.stepThrough(rayCopy);									// copy of ray steps through portal
+					renderPart(wallScreenArea, rayCopy, recursionDepth + 1);		// edge (segment behind it) is drawn
 				}
 				else {
 					sf::FloatRect wallArea;
 					wallArea.left = intersection.distanceToWallEdge * hitEdge.getWidth();
-					wallArea.top = 1 - (segment.segmentFloorHeight + segment.segmentWallHeight);
+					wallArea.top = 1 - wallTopHeight;
 					wallArea.width = viewWidth(camera.hFOV / renderWidth, distance);
 					wallArea.height = segment.segmentWallHeight;
-					hitEdge.draw(*renderTarget, edgeArea, wallArea);
+					hitEdge.draw(*renderTarget, wallScreenArea, wallArea);
 				}
 
-				segment.floor->draw(*renderTarget, floorArea, sf::Vector2f{ 0.0f, 0.0f }, sf::Vector2f{ 0.0f, 0.0f }); // TODO: make floor & edge draw correctly (for textured floor)
-				segment.ceiling->draw(*renderTarget, ceilingArea, sf::Vector2f{ 0.0f, 0.0f }, sf::Vector2f{ 0.0f, 0.0f });
+				floorPtr floor = segment.floor;
+				ceilingPtr ceiling = segment.ceiling;
+
+				float hT = wallTopHeight - ray.getPosition().z;
+				float ceilingPixelVPheight = vpWallTop;
+				sf::FloatRect ceilingPixel{ renderArea.left, scrWallTop - 1.0f, 1.0f, 1.0f };
+				while (ceilingPixel.top > renderArea.top) {
+
+					float p = hT / (ceilingPixelVPheight * ray.correctionFactor);
+					sf::Vector2f ceilingPoint = toVector2(ray.getPosition()) + p * ray.getDirection();
+
+					ceiling->drawPixel(*renderTarget, ceilingPixel, ceilingPoint.x, ceilingPoint.y);
+
+					ceilingPixelVPheight += 2.0f * (camera.viewPlaneHeight / renderHeight);
+					ceilingPixel.top -= 1.0f;
+				}
+
+				float hB = ray.getPosition().z - wallBottomHeight;
+				float floorPixelVPHeight = -1.0f * vpWallBottom;
+				sf::FloatRect floorPixel{ renderArea.left, scrWallBottom, 1.0f, 1.0f };
+				while (floorPixel.top < (renderArea.top + renderArea.height)) {
+
+					float p = hB / (floorPixelVPHeight * ray.correctionFactor);
+					sf::Vector2f floorPoint = toVector2(ray.getPosition()) + p * ray.getDirection();
+
+					floor->drawPixel(*renderTarget, floorPixel, floorPoint.x, floorPoint.y);
+
+					floorPixelVPHeight += 2.0f * (camera.viewPlaneHeight / renderHeight);
+					floorPixel.top += 1.0f;
+				}
 
 				return;
 			}
@@ -150,13 +187,23 @@ namespace ps {
 		fillWithBlack(*renderTarget, renderArea);
 	}
 
-	float RayCaster::projectToScreen(float hei, float distance)
+	float RayCaster::distanceToViewPlane(float distance, float height)
 	{
-		float h = hei - camera.getPosition().z;
-		float H = h * camera.viewPlaneHeight / distance;
-		float scrH = (H - camera.viewPlaneHeight) * ((float)renderHeight / (- 2.0f * camera.viewPlaneHeight));
-		return scrH;
+		return (height - camera.position.z) / distance;
 	}
+
+	float RayCaster::viewPlaneToScreen(float x)
+	{
+		return mapIntervals(camera.viewPlaneHeight, -1.0f * camera.viewPlaneHeight, 0.0f, (float)renderHeight, x);
+	}
+
+	//float RayCaster::projectToScreen(float hei, float distance)
+	//{
+	//	float h = hei - camera.getPosition().z;
+	//	float H = h * camera.viewPlaneHeight / distance;
+	//	float scrH = (H - camera.viewPlaneHeight) * ((float)renderHeight / (- 2.0f * camera.viewPlaneHeight));
+	//	return scrH;
+	//}
 
 	Camera::Camera(sf::Vector3f origin, sf::Vector2f direction, std::size_t segment) : viewPlane(), ObjectInScene(origin, direction, segment)
 	{

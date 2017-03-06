@@ -5,35 +5,41 @@
 #include <SFML\Graphics.hpp>
 
 namespace ps {
-	class Floor {
+	class FloorCeiling {
 	public:
-		virtual void draw(sf::RenderTarget & rt, sf::FloatRect drawArea, sf::Vector2f edgeBottom, sf::Vector2f screenBottom) = 0;
+		virtual void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea,  float pixelX, float pixelY) = 0;
 	};
 
-	class Ceiling {
-	public:
-		virtual void draw(sf::RenderTarget & rt, sf::FloatRect drawArea, sf::Vector2f edgeTop, sf::Vector2f screenTop) = 0;
-	};
-
-	class ColoredFloor : public Floor {
-	public:
-		ColoredFloor(sf::Color color_);
-
-		void draw(sf::RenderTarget & rt, sf::FloatRect drawArea, sf::Vector2f edgeBottom, sf::Vector2f screenBottom);
-
+	class ColoredFloorCeiling : public FloorCeiling {
 	private:
 		sf::Color color;
-	};
 
-	class ColoredCeiling : public Ceiling {
 	public:
-		ColoredCeiling(sf::Color color_);
+		ColoredFloorCeiling(sf::Color color_);
 
-		void draw(sf::RenderTarget & rt, sf::FloatRect drawArea, sf::Vector2f edgeTop, sf::Vector2f screenTop);
-
-	private:
-		sf::Color color;
+		void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY);
 	};
+
+	class TexturedFloorCeiling : public FloorCeiling {
+	private:
+		sf::Texture texture;
+		sf::RectangleShape shape;
+
+	public:
+		TexturedFloorCeiling(sf::Texture texture_);
+
+		void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY);
+	};
+
+	// Floor and Ceiling are basically the same structure.
+	using Floor = FloorCeiling;
+	using Ceiling = FloorCeiling;
+
+	using ColoredFloor = ColoredFloorCeiling;
+	using ColoredCeiling = ColoredFloorCeiling;
+
+	using TexturedFloor = TexturedFloorCeiling;
+	using TexturedCeiling = TexturedFloorCeiling;
 
 	using floorPtr = std::shared_ptr<Floor>;
 	using ceilingPtr = std::shared_ptr<Ceiling>;

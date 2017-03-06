@@ -59,6 +59,7 @@ namespace ps {
 
 		// Sets camera of the ray-caster.
 		void setCamera(Camera camera_);
+		void moveCamera(sf::Vector3f offset);
 		void goForwardCamera(float distance);
 		void ascendCamera(float distance);
 		void rotateCamera(float angle);
@@ -70,13 +71,14 @@ namespace ps {
 		// Renders the scene from the camera's point of view.
 		void render(sf::RenderTarget & rt);
 
-		friend int ps::main();
-
+		friend class Game;
 	private:
 
 		RayWithFishbowlCorrection generateRay(int i);
 		void renderPart(const sf::FloatRect & renderArea, const RayWithFishbowlCorrection & ray, int recursionDepth);
-		float projectToScreen(float height, float distance);
+
+		float distanceToViewPlane(float distance, float height);
+		float viewPlaneToScreen(float x);
 	};
 }
 
