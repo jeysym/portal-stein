@@ -42,15 +42,15 @@ namespace ps {
 
 	void Game::run()
 	{
-		unsigned int wWidth = 400;
-		unsigned int wHeight = 300;
+		unsigned int wWidth = 1920;
+		unsigned int wHeight = 1080;
 
 		float walkForce = 500.0f;
 		float ascendForce = 30.0f;
 		float rotateTorque = 80.0f;
 
 		Camera camera{ sf::Vector3f{ 4.0f, 1.0f, 0.5f }, sf::Vector2f{ 0.62f, -0.7f }, 0 };
-		camera.setFOV(PI<float> * 0.5f, 4.0f / 3.0f);
+		camera.setFOV(PI<float> * 0.5f, 16.0f / 9.0f);
 		auto scene = makeTestScene();
 
 		RayCaster caster{ camera };
@@ -113,7 +113,7 @@ namespace ps {
 			}
 
 			float playerSpeed = norm(player.getCurrentVelocity());
-			float k1 = 80.0f;
+			float k1 = 190.0f;
 			float k2 = 30.0f;
 			float dragMagnitude = k1 * playerSpeed + k2 * playerSpeed * playerSpeed;
 			player.applyForce(-1.0f * dragMagnitude * player.getCurrentVelocity());

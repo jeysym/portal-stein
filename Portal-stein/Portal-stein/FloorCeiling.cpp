@@ -2,38 +2,33 @@
 
 namespace ps {
 
-
-
-
-	ColoredFloorCeiling::ColoredFloorCeiling(sf::Color color_) : color(color_)
-	{
+	ColoredFloorCeiling::ColoredFloorCeiling(sf::Color color_) : color(color_) {
 	}
 
-	void ColoredFloorCeiling::drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY)
+	void ColoredFloorCeiling::draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray)
 	{
-		sf::RectangleShape rs;
-		rs.setPosition(renderArea.left, renderArea.top);
-		rs.setSize(sf::Vector2f{ renderArea.width, renderArea.height });
-		rs.setFillColor(color);
-		rt.draw(rs);
+		for (int i = 0; i < vertexArray.getVertexCount(); ++i) {
+			vertexArray[i].color = color;
+		}
+
+		rt.draw(vertexArray);
 	}
 
-	TexturedFloorCeiling::TexturedFloorCeiling(sf::Texture texture_) : texture(texture_), shape(sf::Vector2f{ 1.0f, 1.0f })
+	TexturedFloorCeiling::TexturedFloorCeiling(sf::Texture texture_) : texture(texture_)
 	{
 		texture.setRepeated(true);
-		shape.setTexture(&texture);
 	}
 
-	void TexturedFloorCeiling::drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY)
+	void TexturedFloorCeiling::draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray)
 	{
-		shape.setPosition(renderArea.left, renderArea.top);
-		shape.setSize(sf::Vector2f{ renderArea.width, renderArea.height });
+		for (int i = 0; i < vertexArray.getVertexCount(); ++i) {
+			vertexArray[i].texCoords.x *= texture.getSize().x;
+			vertexArray[i].texCoords.y *= texture.getSize().y;
+		}
 
-		int texLeft = (int)(pixelX * texture.getSize().x);
-		int texTop = (int)(pixelY * texture.getSize().y);
-		shape.setTextureRect(sf::IntRect{texLeft, texTop, 1, 1});
-
-		rt.draw(shape);
+		rt.draw(vertexArray, &texture);
 	}
+
+
 
 }

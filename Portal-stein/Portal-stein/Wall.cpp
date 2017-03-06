@@ -54,45 +54,34 @@ namespace ps {
 		return intersection.theyIntersect;
 	}
 
-	ColoredWall::ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_) : Wall(from, to), drawRectangle() { 
-		drawRectangle.setFillColor(color_);
+	ColoredWall::ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_) : Wall(from, to), color(color_) { 
 	}
 
-	void ColoredWall::draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea)
+	void ColoredWall::draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV)
 	{
-		sf::Vector2f renderPos{ renderArea.left, renderArea.top };
-		sf::Vector2f renderSize{ renderArea.width, renderArea.height };
-		drawRectangle.setPosition(renderPos);
-		drawRectangle.setSize(renderSize);
-		rt.draw(drawRectangle);
+		sf::VertexArray vertexArr{ sf::PrimitiveType::Lines, 2 };
+		vertexArr[0] = sf::Vertex{ a, color };
+		vertexArr[1] = sf::Vertex{ b, color };
+		rt.draw(vertexArr);
 	}
 
-	TexturedWall::TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Wall(from, to), texture(texture_), drawRectangle() {
+	TexturedWall::TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_) : Wall(from, to), texture(texture_) {
 		texture.setRepeated(true);
-		drawRectangle.setTexture(&texture);
 	}
 
-	inline sf::IntRect getTextureIntRectangle(const sf::FloatRect & rectangle, const sf::Texture & texture) {
-		sf::IntRect result;
-		sf::Vector2u textureSize = texture.getSize();
-
-		result.left = (int)floor(rectangle.left * textureSize.x);
-		result.top = (int)floor(rectangle.top * textureSize.y);
-
-		result.width = (int)ceil(rectangle.width * textureSize.x);
-		result.height = (int)ceil(rectangle.height * textureSize.y);
-
-		return result;
-	}
-
-	void TexturedWall::draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea)
+	void TexturedWall::draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV)
 	{
-		sf::Vector2f renderPos{ renderArea.left, renderArea.top };
-		sf::Vector2f renderSize{ renderArea.width, renderArea.height };
-		drawRectangle.setPosition(renderPos);
-		drawRectangle.setSize(renderSize);
-		drawRectangle.setTextureRect(getTextureIntRectangle(wallArea, texture));
-		rt.draw(drawRectangle);
+		sf::VertexArray vertexArr{ sf::PrimitiveType::Lines, 2 };
+
+		aUV.x *= texture.getSize().x;
+		aUV.y *= texture.getSize().y;
+		bUV.x *= texture.getSize().x;
+		bUV.y *= texture.getSize().y;
+
+		vertexArr[0] = sf::Vertex{ a, aUV };
+		vertexArr[1] = sf::Vertex{ b, bUV };
+
+		rt.draw(vertexArr, &texture);
 	}
 
 
@@ -101,7 +90,7 @@ namespace ps {
 		setPortal(portal_);
 	}
 
-	void DoorWall::draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea) {
+	void DoorWall::draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV) {
 		// DoorWall is not drawn
 	}
 
@@ -111,7 +100,7 @@ namespace ps {
 		setPortal(portal_);
 	}
 
-	void WallPortalWall::draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea) {
+	void WallPortalWall::draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV) {
 		// Wall portal wall is not drawn
 	}
 

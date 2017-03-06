@@ -34,7 +34,7 @@ namespace ps {
 		// Returns true if line segment intersects the wall.
 		bool intersect(const LineSegment & lineSegment_) const;
 		// Draws the wall on the RenderTarget.
-		virtual void draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea) = 0;
+		virtual void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV) = 0;
 	};
 
 	struct WallIntersection {
@@ -45,37 +45,36 @@ namespace ps {
 
 	class ColoredWall : public Wall {
 	private:
-		sf::RectangleShape drawRectangle;
+		sf::Color color;
 
 	public:
 		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
 
-		void draw(sf::RenderTarget & rt, const sf::FloatRect  & renderArea, const sf::FloatRect & wallArea);
+		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
 	};
 
 	class TexturedWall : public Wall {
 	private:
 		sf::Texture texture;
-		sf::RectangleShape drawRectangle;
 
 	public:
 		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
 
-		void draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea);
+		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
 	};
 
 	class DoorWall : public Wall {
 	public:
 		DoorWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment);
 
-		void draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea);
+		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
 	};
 
 	class WallPortalWall : public Wall {
 	public:
 		WallPortalWall(LineSegment wallFrom, LineSegment wallTo, std::size_t targetSegment_);
 
-		void draw(sf::RenderTarget & rt, const sf::FloatRect & renderArea, const sf::FloatRect & wallArea);
+		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
 	};
 }
 

@@ -75,7 +75,7 @@ namespace ps {
 	private:
 
 		RayWithFishbowlCorrection generateRay(int i);
-		void renderPart(const sf::FloatRect & renderArea, const RayWithFishbowlCorrection & ray, int recursionDepth);
+		void renderPart(const int columnNumber, const float from, const float to, const RayWithFishbowlCorrection & ray, int recursionDepth);
 
 		float distanceToViewPlane(float distance, float height);
 		float viewPlaneToScreen(float x);

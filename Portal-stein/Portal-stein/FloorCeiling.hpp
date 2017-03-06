@@ -7,7 +7,7 @@
 namespace ps {
 	class FloorCeiling {
 	public:
-		virtual void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea,  float pixelX, float pixelY) = 0;
+		virtual void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray) = 0;
 	};
 
 	class ColoredFloorCeiling : public FloorCeiling {
@@ -17,18 +17,17 @@ namespace ps {
 	public:
 		ColoredFloorCeiling(sf::Color color_);
 
-		void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY);
+		void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray);
 	};
 
 	class TexturedFloorCeiling : public FloorCeiling {
 	private:
 		sf::Texture texture;
-		sf::RectangleShape shape;
 
 	public:
 		TexturedFloorCeiling(sf::Texture texture_);
 
-		void drawPixel(sf::RenderTarget & rt, const sf::FloatRect & renderArea, float pixelX, float pixelY);
+		void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray);
 	};
 
 	// Floor and Ceiling are basically the same structure.
