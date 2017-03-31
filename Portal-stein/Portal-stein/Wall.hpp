@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PS_EDGE_INCLUDED
-#define PS_EDGE_INCLUDED
+#ifndef PS_WALL_INCLUDED
+#define PS_WALL_INCLUDED
 #include <memory>
 #include <SFML\Graphics.hpp>
 #include "Portal.hpp"
@@ -9,73 +9,82 @@
 
 namespace ps {
 
-	struct WallIntersection;
-
-	class Wall {
-	private:
-		LineSegment lineSegment;
-		portalUPtr portal;
-
-	public:
-		Wall(sf::Vector2f from_, sf::Vector2f to_);
-
-		// Gets width of the wall.
-		float getWidth() const;
-		// Assings a potral to the wall.
-		void setPortal(portalUPtr & portal_);
-		// Returns true, if wall is a portal.
-		bool isPortal() const;
-		// Object steps through wall. Has no effect if wall not a portal.
-		void stepThrough(ObjectInScene & obj) const;
-		// Returns true if the wall faces the ray. Returning false means this wall is not visible by that ray.
-		bool facesRay(const Ray & ray);
-		// Intersects the wall with a ray.
-		bool intersect(const Ray & ray, WallIntersection & intersection) const;
-		// Returns true if line segment intersects the wall.
-		bool intersect(const LineSegment & lineSegment_) const;
-		// Draws the wall on the RenderTarget.
-		virtual void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV) = 0;
+	struct WallDrawParameters {
+		sf::Vector2f scrWallTop;		// Screen coordinate of wall top
+		sf::Vector2f scrWallBottom;		// Screen coordinate of wall bottom
+		sf::Vector2f uvWallTop;			// Texture coordinate of wall top
+		sf::Vector2f uvWallBottom;		// Texture coordinate of wall bottom
 	};
 
 	struct WallIntersection {
-		Wall * wallThatWasHit;
-		float rayIntersectionDistance;
-		float distanceToWallEdge;
+		float rayIntersectionDistance;	// Distance of from ray origin to hit point
+		float distanceToWallEdge;		// Distance from Wall edge to hit point
 	};
 
-	class ColoredWall : public Wall {
+
+
+	//************************************************************************
+	// WALL CLASSES
+	//************************************************************************
+
+	// Class that represents wall, that has color and (optional) texture.
+	class Wall {
 	private:
 		sf::Color color;
+		sf::Texture * texture;
 
 	public:
-		ColoredWall(sf::Vector2f from, sf::Vector2f to, sf::Color color_);
+		sf::Vector2f from;
+		sf::Vector2f to;
 
-		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
+		// Creates a colored wall.
+		Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color);
+		// Creates a wall with color + texture. 
+		Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color, sf::Texture * texture);
+
+		// Draws the wall on render target, according to draw parameters that were passed.
+		void draw(sf::RenderTarget & rt, const WallDrawParameters & params) const;
+
+		// Gets width of the wall.
+		float getWidth() const;
+		// Returns true if the wall faces the ray. Returning false means this wall is not visible by that ray.
+		bool facesRay(const Ray & ray) const;
+		// Intersects the wall with a ray. Intersection is returned as out parameter.
+		bool intersect(const Ray & ray, WallIntersection & intersection) const;
+		// Returns true if line segment intersects the wall.
+		bool intersect(const LineSegment & lineSegment_) const;
 	};
 
-	class TexturedWall : public Wall {
+	class PortalWall : public Wall {
 	private:
-		sf::Texture texture;
+		portalUPtr portal;
 
 	public:
-		TexturedWall(sf::Vector2f from, sf::Vector2f to, sf::Texture texture_);
 
-		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
+		// Creates a colored wall.
+		PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color);
+		// Creates a wall with color + texture.
+		PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color, sf::Texture * texture);
+
+		// Returns true if this wall has portal on it.
+		bool isPortal() const;
+		// Takes object and passes it through portal.
+		void stepThrough(ObjectInScene & obj) const;
+		// Sets portal for this wall.
+		void setPortal(portalUPtr && portal);
 	};
 
-	class DoorWall : public Wall {
-	public:
-		DoorWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment);
 
-		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
-	};
 
-	class WallPortalWall : public Wall {
-	public:
-		WallPortalWall(LineSegment wallFrom, LineSegment wallTo, std::size_t targetSegment_);
+	//************************************************************************
+	// PREDEFINED WALLS WITH COMMON PORTALS
+	//************************************************************************
 
-		void draw(sf::RenderTarget & rt, sf::Vector2f a, sf::Vector2f b, sf::Vector2f aUV, sf::Vector2f bUV);
-	};
+	// Makes PortalWall that has Door portal on it.
+	PortalWall makeDoorWall(sf::Vector2f from, sf::Vector2f to, std::size_t targetSegment);
+
+	// Makes PortalWall that has WallPortal on it. 
+	PortalWall makeWallPortalWall(LineSegment wallFrom, LineSegment wallTo, std::size_t targetSegment_);
 }
 
-#endif // !PS_EDGE_INCLUDED
+#endif // !PS_WALL_INCLUDED

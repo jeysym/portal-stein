@@ -40,7 +40,7 @@ namespace ps {
 		float finalRotation = angleFromAtoB;
 
 		// Apply the actual transformation to object.
-		obj.move(finalOffset);
+		obj.position += toVector3(finalOffset);
 		obj.rotate(finalRotation);
 	}
 

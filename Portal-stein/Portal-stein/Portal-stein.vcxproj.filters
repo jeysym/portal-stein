@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Dll files">
+      <UniqueIdentifier>{aef99377-9a01-415c-bb14-9404f65194c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="portal-stein.cpp">
@@ -39,10 +42,16 @@
     <ClCompile Include="Geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Simulation.cpp">
+    <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="LevelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SegmentBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,8 +86,34 @@
     <ClInclude Include="Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Simulation.hpp">
+    <ClInclude Include="LevelLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Level.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SegmentBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sfml-window-d-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
+    <None Include="sfml-window-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
+    <None Include="sfml-system-d-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
+    <None Include="sfml-system-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
+    <None Include="sfml-graphics-d-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
+    <None Include="sfml-graphics-2.dll">
+      <Filter>Dll files</Filter>
+    </None>
   </ItemGroup>
 </Project>

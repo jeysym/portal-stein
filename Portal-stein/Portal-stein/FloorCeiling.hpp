@@ -5,43 +5,53 @@
 #include <SFML\Graphics.hpp>
 
 namespace ps {
+
+	struct FloorCeilingDrawParameters {
+		sf::Vector2f scrTop;
+		sf::Vector2f scrBottom;
+
+		sf::Vector2f uvCamera;
+		sf::Vector2f uvDirection;
+
+		float deltaH;
+		float viewPlaneDistance;
+		float vpTop;
+		float vpBottom;
+	};
+
+	//**************************************************************************
+	// FLOOR AND CEILING CLASS
+	//**************************************************************************
+
+	// Class representing floor (ceiling) that has color and texture.
 	class FloorCeiling {
-	public:
-		virtual void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray) = 0;
-	};
-
-	class ColoredFloorCeiling : public FloorCeiling {
 	private:
+		static sf::Shader shader;
+
 		sf::Color color;
+		sf::Texture * texture;
 
 	public:
-		ColoredFloorCeiling(sf::Color color_);
+		static void compileShaders();
 
-		void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray);
+		// Draws this floor / ceiling according to draw parameters.
+		void draw(sf::RenderTarget & rt, const FloorCeilingDrawParameters & params) const;
+
+		// Creates colored floor/ceiling.
+		FloorCeiling(const sf::Color & color_);
+		// Creates floor/ceiling with color + texture.
+		FloorCeiling(const sf::Color & color_, sf::Texture * texture_);
 	};
 
-	class TexturedFloorCeiling : public FloorCeiling {
-	private:
-		sf::Texture texture;
 
-	public:
-		TexturedFloorCeiling(sf::Texture texture_);
 
-		void draw(sf::RenderTarget & rt, sf::VertexArray & vertexArray);
-	};
+	//**************************************************************************
+	// ADDITIONAL TYPE DEFINITIONS
+	//**************************************************************************
 
-	// Floor and Ceiling are basically the same structure.
+	// Floor and Ceiling are basically the same structure. Theese structures are just for type safety.
 	using Floor = FloorCeiling;
 	using Ceiling = FloorCeiling;
-
-	using ColoredFloor = ColoredFloorCeiling;
-	using ColoredCeiling = ColoredFloorCeiling;
-
-	using TexturedFloor = TexturedFloorCeiling;
-	using TexturedCeiling = TexturedFloorCeiling;
-
-	using floorPtr = std::shared_ptr<Floor>;
-	using ceilingPtr = std::shared_ptr<Ceiling>;
 }
 
 #endif // !PS_FLOOR_CEILING_INCLUDED

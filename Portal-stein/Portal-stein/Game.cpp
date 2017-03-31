@@ -1,147 +1,210 @@
-#include "Game.hpp"
 #include <memory>
-#include "RayCaster.hpp"
+#include "Game.hpp"
 #include "Math.hpp"
+#include "SegmentBuilder.hpp"
+#include "FloorCeiling.hpp"
+#include <filesystem>
 
 namespace ps {
 
+	sf::Texture wallTex;
+	sf::Texture metalTex;
+	sf::Texture floorTex;
+	sf::Texture ceilingTex;
+
 	std::shared_ptr<Scene> makeTestScene() {
-		auto result = std::make_shared<Scene>();
+		wallTex.loadFromFile("levels\\textures\\wall.bmp");
+		metalTex.loadFromFile("levels\\textures\\metal.bmp");
+		floorTex.loadFromFile("levels\\textures\\floor.bmp");
+		ceilingTex.loadFromFile("levels\\textures\\ceiling.bmp");
 
-		sf::Texture wallTex;
-		wallTex.loadFromFile("H:\\MyData\\Textures\\wall.bmp");
-		sf::Texture metalTex;
-		metalTex.loadFromFile("H:\\MyData\\Textures\\metal.bmp");
-		sf::Texture floorTex;
-		floorTex.loadFromFile("H:\\MyData\\Textures\\floor.bmp");
-		sf::Texture ceilingTex;
-		ceilingTex.loadFromFile("H:\\MyData\\Textures\\ceiling.bmp");
+		sf::Vector2f a(0.0f, 0.0f);
+		sf::Vector2f b(0.0f, 10.0f);
+		sf::Vector2f c(10.0f, 10.0f);
+		sf::Vector2f d(10.0f, 0.0f);
 
-		floorPtr floor = std::make_shared<TexturedFloor>(floorTex);
-		ceilingPtr ceiling = std::make_shared<TexturedCeiling>(ceilingTex);
+		sf::Vector2f offset(40.0f, 0.0f);
+		sf::Vector2f e = a + offset;
+		sf::Vector2f f = b + offset;
+		sf::Vector2f g = c + offset;
+		sf::Vector2f h = d + offset;
 
-		sf::Vector2f a{ 0.0f, 2.0f };
-		sf::Vector2f b{ 2.0f, 2.0f };
-		sf::Vector2f c{ 12.0f, 2.0f };
-		sf::Vector2f d{ 0.0f, 0.0f };
-		sf::Vector2f e{ 10.0f, 0.0f };
-		sf::Vector2f f{ 12.0f, 0.0f };
+		Floor floor(sf::Color::White, &floorTex);
+		Ceiling ceiling(sf::Color::White, &ceilingTex);
 
-		Segment room0{ floor, ceiling };
-		room0.edges.push_back(std::make_unique<WallPortalWall>(LineSegment{ a, b }, LineSegment{ e, f }, 0));
-		room0.edges.push_back(std::make_unique<TexturedWall>(b, c, wallTex));
-		room0.edges.push_back(std::make_unique<TexturedWall>(c, f, wallTex));
-		room0.edges.push_back(std::make_unique<WallPortalWall>(LineSegment{ f, e }, LineSegment{ b, a }, 0));
-		room0.edges.push_back(std::make_unique<TexturedWall>(e, d, metalTex));
-		room0.edges.push_back(std::make_unique<TexturedWall>(d, a, metalTex));
+		SegmentBuilder segment0( floor, ceiling );
+		segment0.addWall(PortalWall(a, b, sf::Color::Green));
+		segment0.addWall(PortalWall(b, c, sf::Color::White, &wallTex));
+		segment0.addWall(makeWallPortalWall(LineSegment(c, d), LineSegment(g, f), 1));
+		segment0.addWall(PortalWall(d, a, sf::Color::Green));
 
-		result->addSegment(room0);
+		SegmentBuilder segment1(floor, ceiling);
+		segment1.addWall(PortalWall(e, f, sf::Color::Yellow));
+		segment1.addWall(makeWallPortalWall(LineSegment(f, g), LineSegment(d, c), 0));
+		segment1.addWall(PortalWall(g, h, sf::Color::Yellow));
+		segment1.addWall(PortalWall(h, e, sf::Color::Yellow));
 
+		auto result = std::make_shared<Scene>(
+			ObjectInScene(sf::Vector3f(1.0f, 1.0f, 0.5f), sf::Vector2f(1.0f, 1.0f), 0)
+		);
+		
+		result->addSegment(segment0.finalize());
+		result->addSegment(segment1.finalize());
 		return result;
+	}
+
+/*
+	void Game::drawInfo(sf::RenderWindow & window, RayCaster & caster, float secondsElapsed)
+	{
+		sf::Text info{ "N/A", textFont };
+		info.setFillColor(sf::Color::Black);
+		info.setStyle(sf::Text::Bold);
+
+		auto position = caster.camera.getPosition();
+		auto direction = caster.camera.getDirection();
+		auto segmentId = caster.camera.getSegmentId();
+
+		info.setString(
+			"pos = (" + std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z) + ")\n" +
+			"dir = (" + std::to_string(direction.x) + "," + std::to_string(direction.y) + ")\n" +
+			"segment = " + std::to_string(segmentId) + "\n" +
+			"fps = " + std::to_string((int)(1.0f / secondsElapsed))
+		);
+
+		window.draw(info);
+	}
+*/
+
+	void Game::simulateDrag(Scene & scene)
+	{
+		auto speed = scene.camera.getSpeed();
+		auto angularSpeed = scene.camera.getAngularSpeed();
+
+		auto walkDrag = -walkDragCoefficient1 * speed - walkDragCoefficient2 * norm(speed) * speed;
+		scene.camera.applyForce(walkDrag);
+		scene.camera.applyTorque(-1.0f * angularSpeed * rotateDragCoefficient);
+	}
+
+	void Game::processUserInput(sf::RenderWindow & window, Scene & scene, float deltaTime)
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			// dispatch all the events in the queue
+
+			if (event.type == sf::Event::Closed)
+				window.close();
+
+			if (event.type == sf::Event::Resized) {
+				// If window gets resized, the window gets recreated with different video mode
+				auto width = window.getSize().x;
+				auto height = window.getSize().y;
+
+				window.create(sf::VideoMode{ width, height }, "Portal-stein");
+			}
+		}
+
+		auto direction = ps::toVector3(scene.camera.getDirection());
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			scene.camera.applyForce(walkForce * direction);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+			scene.camera.applyForce(-1.0f * walkForce * direction);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+			scene.camera.applyTorque(rotateTorque);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+			scene.camera.applyTorque(-1.0f * rotateTorque);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, 1.0f));
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, -1.0f));
+		}
+	}
+
+	sf::Font textFont;
+
+	void Game::loadFont()
+	{
+		std::string pathToFont = "fonts\\OpenBaskerville-0.0.53.otf";
+		bool success = textFont.loadFromFile(pathToFont);
+
+		if (success == false) 
+			throw std::runtime_error("Font " + pathToFont + " could not be loaded!");
+	}
+
+	Game::Game()
+	{
+		// Floor ceiling must have its shaders compiled before the game starts.
+		FloorCeiling::compileShaders();
+		
+		loadFont();
+
+		walkForce = 200.0f;
+		ascendForce = 20.0f;
+		rotateTorque = 100.0f;
+
+		walkDragCoefficient1 = 70.0f;
+		walkDragCoefficient2 = 10.0f;
+		rotateDragCoefficient = 100.0f;
+	}
+
+	void drawInfo(sf::RenderTarget & window, Scene & scene, float secondsElapsed)
+	{
+		sf::Text info{ "N/A", textFont };
+		info.setFillColor(sf::Color::Black);
+		info.setStyle(sf::Text::Bold);
+
+		auto position = scene.camera.getPosition();
+		auto direction = scene.camera.getDirection();
+		auto segmentId = scene.camera.getSegmentId();
+
+		info.setString(
+			"pos = (" + std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z) + ")\n" +
+			"dir = (" + std::to_string(direction.x) + "," + std::to_string(direction.y) + ")\n" +
+			"segment = " + std::to_string(segmentId) + "\n" +
+			"fps = " + std::to_string((int)(1.0f / secondsElapsed))
+		);
+
+		window.draw(info);
 	}
 
 	void Game::run()
 	{
-		unsigned int wWidth = 1920;
-		unsigned int wHeight = 1080;
-
-		float walkForce = 500.0f;
-		float ascendForce = 30.0f;
-		float rotateTorque = 80.0f;
-
-		Camera camera{ sf::Vector3f{ 4.0f, 1.0f, 0.5f }, sf::Vector2f{ 0.62f, -0.7f }, 0 };
-		camera.setFOV(PI<float> * 0.5f, 16.0f / 9.0f);
+		RayCaster caster;
+		
 		auto scene = makeTestScene();
-
-		RayCaster caster{ camera };
-		caster.setScene(scene);
-
-		sf::RenderWindow window{ sf::VideoMode{ wWidth, wHeight }, "Portal-stein" };
+		
+		unsigned int wWidth = 800;
+		unsigned int wHeight = 600;
+		sf::RenderWindow window( sf::VideoMode( wWidth, wHeight ), "Portal-stein" );
 		window.setVerticalSyncEnabled(true);
-
-		sf::Font font;
-		font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
-		sf::Text info{ "NA", font };
-		info.setFillColor(sf::Color::Black);
-
-		RigidBody player{ 75.0f };
 
 		// get the clock object
 		sf::Clock clock;
+		float deltaTime = 0.001f;
 
-		
 		while (window.isOpen())
 		{
 			// measure the time elapsed from the last draw
-			float secondsElapsed = clock.getElapsedTime().asSeconds();
+			deltaTime = clock.getElapsedTime().asSeconds();
 			clock.restart();
 
-			sf::Event event;
-			while (window.pollEvent(event))
-			{
-				// dispatch all the events in the queue
+			processUserInput(window, *scene, deltaTime);
+			simulateDrag(*scene);
+			scene->camera.simulate(deltaTime);
 
-				if (event.type == sf::Event::Closed)
-					window.close();
-			}
-
-			sf::Vector3f cameraDirection = toVector3(caster.camera.getDirection());
-			sf::Vector3f upDirection{ 0.0f, 0.0f, 1.0f };
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-				player.applyForce(walkForce * cameraDirection);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-				player.applyForce(-1.0f * walkForce * cameraDirection);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-				player.applyTorque(rotateTorque);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-				player.applyTorque(-1.0f * rotateTorque);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-				player.applyForce(ascendForce * upDirection);
-			}
-
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-				player.applyForce(-1.0f * ascendForce * upDirection);
-			}
-
-			float playerSpeed = norm(player.getCurrentVelocity());
-			float k1 = 190.0f;
-			float k2 = 30.0f;
-			float dragMagnitude = k1 * playerSpeed + k2 * playerSpeed * playerSpeed;
-			player.applyForce(-1.0f * dragMagnitude * player.getCurrentVelocity());
-
-			float rk = 80.0f;
-			player.applyTorque(-1.0f * rk * player.getAngularSpeed());
-
-			player.Simulate(secondsElapsed);
-
-			auto positionChange = secondsElapsed * player.getCurrentVelocity();
-			auto rotationChange = secondsElapsed * player.getAngularSpeed();
-			caster.moveCamera(positionChange);
-			caster.rotateCamera(rotationChange);
-
-			window.clear(sf::Color::Black);
-			caster.render(window);
-
-			auto position = caster.camera.getPosition();
-			auto direction = caster.camera.getDirection();
-			auto segmentId = caster.camera.getSegmentId();
-			info.setString(
-				"pos = [" + std::to_string(position.x) + "," + std::to_string(position.y) + "]\n" +
-				"dir = [" + std::to_string(direction.x) + "," + std::to_string(direction.y) + "]\n" +
-				"segment = " + std::to_string(segmentId) + "\n" +
-				"fps = " + std::to_string((int)(1.0f / secondsElapsed))
-			);
-
-			window.draw(info);
+			window.clear(sf::Color::Black);				// clear the window
+			caster.render(window, *scene);				// render the game
+			drawInfo(window, *scene, deltaTime);		// draw some additional info
 
 			window.display();
 		}

@@ -54,8 +54,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
+  <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -156,7 +155,9 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Geometry.cpp" />
-    <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="SegmentBuilder.cpp" />
     <ClCompile Include="Wall.cpp" />
     <ClCompile Include="FloorCeiling.cpp" />
     <ClCompile Include="portal-stein.cpp" />
@@ -168,7 +169,9 @@
   <ItemGroup>
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Geometry.hpp" />
-    <ClInclude Include="Simulation.hpp" />
+    <ClInclude Include="Level.hpp" />
+    <ClInclude Include="LevelLoader.hpp" />
+    <ClInclude Include="SegmentBuilder.hpp" />
     <ClInclude Include="Solve.hpp" />
     <ClInclude Include="Wall.hpp" />
     <ClInclude Include="FloorCeiling.hpp" />
@@ -177,6 +180,14 @@
     <ClInclude Include="RayCaster.hpp" />
     <ClInclude Include="Scene.hpp" />
     <ClInclude Include="ObjectInScene.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sfml-graphics-2.dll" />
+    <None Include="sfml-graphics-d-2.dll" />
+    <None Include="sfml-system-2.dll" />
+    <None Include="sfml-system-d-2.dll" />
+    <None Include="sfml-window-2.dll" />
+    <None Include="sfml-window-d-2.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

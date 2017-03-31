@@ -2,7 +2,7 @@
 #include "Math.hpp"
 
 namespace ps {
-	ObjectInScene::ObjectInScene(sf::Vector3f position_, sf::Vector2f direction_, std::size_t segmentId_) : position(position_), direction(normalized(direction_)), segmentId(segmentId_) {}
+	ObjectInScene::ObjectInScene(const sf::Vector3f & position_, const sf::Vector2f & direction_, std::size_t segmentId_) : position(position_), direction(normalized(direction_)), segmentId(segmentId_) {}
 
 	sf::Vector3f ObjectInScene::getPosition() const
 	{
@@ -45,4 +45,5 @@ namespace ps {
 	void ObjectInScene::ascend(float distance) {
 		position.z += distance;
 	}
+
 }
