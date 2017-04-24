@@ -182,29 +182,25 @@ namespace ps {
 		lexer.eat(TokenType::LPAR);
 
 		const Token & lookahead = lexer.getLookahead();
-		if (lookahead.type == TokenType::ID) {
 
-			if (namedColors.contains(lookahead)) {
-				// this id represents color
-				color_ = color();
-
-				if (lexer.lookahead.type == TokenType::COMMA) {
-					// texture can follow
-					lexer.eat(TokenType::COMMA);
-					texture_ = texture();
-				}
-			}
-			else {
-				// id must represent texture
-				texture_ = texture();
-			}
-		}
-		else if (lookahead.type == TokenType::STRING) {
-			// literal texture
+		bool nextIsIdTexture = lookahead.type == TokenType::ID && namedTextures.contains(lookahead);
+		bool nextIsStringTexture = lookahead.type == TokenType::STRING;
+		if (nextIsIdTexture || nextIsStringTexture) {
+			// this id represents texture
+			//     "(" texture ")"
 			texture_ = texture();
 		}
 		else {
 			color_ = color();
+
+			if (lexer.lookahead.type == TokenType::COMMA) {
+				// texture can follow
+				//    "(" color "," texture ")"
+				lexer.eat(TokenType::COMMA);
+				texture_ = texture();
+			}
+			// else it is the case 
+			//     "(" color ")"
 		}
 
 		lexer.eat(TokenType::RPAR);
@@ -225,6 +221,10 @@ namespace ps {
 		loadColorTexture(color, texture);
 		builder.setCeiling(Ceiling(color, texture));
 	}
+
+	enum class PortalType {
+		NONE, DOOR, WALL_PORTAL
+	};
 
 	void LevelLoader::loadWallsAttribute(SegmentBuilder & builder)
 	{
@@ -251,6 +251,10 @@ namespace ps {
 			std::shared_ptr<sf::Texture> currentTexture = defaultTexture;
 			portalPtr currentPortal = nullptr;
 
+			PortalType portalType = PortalType::NONE;
+			std::size_t targetSegmentId = -1;
+			sf::Vector2f to0, to1;
+
 			if (lexer.lookahead.type == TokenType::MINUS) {
 				// wall has no modifiers
 				lexer.eat(TokenType::MINUS);
@@ -258,7 +262,7 @@ namespace ps {
 			else {
 				// wall has some modifiers in this format:
 				//       (color, texture)[portal]
-
+				
 				if (lexer.lookahead.type == TokenType::LPAR) {
 					// wall has appearance modifiers
 					loadColorTexture(currentColor, currentTexture);
@@ -268,32 +272,56 @@ namespace ps {
 					// wall has portal modifier
 					lexer.eat(TokenType::LBRA);
 					Token idToken = lexer.eat(TokenType::ID);
+					targetSegmentId = getSegment(idToken).id;
+					portalType = PortalType::DOOR;
+
+					if (lexer.lookahead.type == TokenType::MINUS) {
+						// portal transports the object to some wall
+						lexer.eat(TokenType::MINUS);
+						to0 = vertex();
+						lexer.eat(TokenType::MINUS);
+						to1 = vertex();
+						portalType = PortalType::WALL_PORTAL;
+					}
+
 					lexer.eat(TokenType::RBRA);
 
-					currentPortal = std::make_shared<Door>(getSegment(idToken).id);
 				}
 			}
 
+			sf::Vector2f from0;
+			sf::Vector2f from1;
+
+			bool end = false;
 			if (lexer.lookahead.type == TokenType::RCBRA) {
-				sf::Vector2f & from = lastVertex;
-				sf::Vector2f & to = firstVertex;
-
-				PortalWall wall(from, to, currentColor, currentTexture);
-				wall.setPortal(currentPortal);
-				builder.addWall(std::move(wall));
-
-				break;
+				from0 = lastVertex;
+				from1 = firstVertex;
+				end = true;
+			}
+			else {
+				sf::Vector2f vertex_ = vertex();
+				from0 = lastVertex;
+				from1 = vertex_;
 			}
 
-			sf::Vector2f vertex_ = vertex();
-			sf::Vector2f & from = lastVertex;
-			sf::Vector2f & to = vertex_;
+			if (portalType == PortalType::DOOR) {
+				currentPortal = std::make_shared<Door>(targetSegmentId);
+			}
+			else if (portalType == PortalType::WALL_PORTAL) {
+				currentPortal = std::make_shared<WallPortal>(
+					LineSegment(from0, from1),
+					LineSegment(to0, to1),
+					targetSegmentId);
+			}
 
-			PortalWall wall(from, to, currentColor, currentTexture);
+			PortalWall wall(from0, from1, currentColor, currentTexture);
 			wall.setPortal(currentPortal);
 			builder.addWall(std::move(wall));
 
-			lastVertex = vertex_;
+			if (end)
+				break;
+
+			lastVertex = from1;
 		}
 
 		lexer.eat(TokenType::RCBRA);

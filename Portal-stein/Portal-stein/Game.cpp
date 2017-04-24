@@ -217,6 +217,8 @@ namespace ps {
 					levels.push_back(loader.loadLevel());
 
 					logFile << timeString << " : \"" << filePath << "\" parsed successfuly!" << std::endl;
+
+					fileStream.close();
 				}
 				catch (UnexpectedTokenException e) {
 					std::string expectedType = getTokenString(e.expected);
