@@ -2,11 +2,10 @@
 #include <memory>
 #include <filesystem>
 #include <fstream>
+#include <chrono>
 
 #include "Math.hpp"
 #include "LevelLoader.hpp"
-//#include "SegmentBuilder.hpp"
-//#include "FloorCeiling.hpp"
 
 namespace ps {
 
@@ -195,25 +194,46 @@ namespace ps {
 	}
 
 	void Game::loadLevels(const std::string & levelDirPath) {
-		std::ifstream fileStream;
-		fileStream.open("levels\\test");	// HACK: temporary 
-
-		LevelLoader loader(fileStream);
-		levels.push_back(loader.loadLevel());
-
-		/*
 		using namespace std::experimental::filesystem;
+		using namespace std::chrono;
+
+		std::ofstream logFile;
+		logFile.open("log.txt", std::ios_base::app);	// opens file in append mode
 
 		for (const path & file : directory_iterator(levelDirPath)) {
 			if (is_regular_file(file)) {
-				std::ifstream fileStream;
-				fileStream.open(file.string());
+				std::string filePath = file.string();
 
-				LevelLoader loader(fileStream);
-				levels.push_back(loader.loadLevel());
+				time_point<system_clock> time = system_clock::now();
+				std::time_t ttime = system_clock::to_time_t(time);
+				std::string timeString = std::string(std::ctime(&ttime)); // TODO : this may be unsafe
+				timeString.pop_back();	// ctime inserts a line-feed character at the end => pop it
+
+				try {
+					std::ifstream fileStream;
+					fileStream.open(filePath);
+
+					LevelLoader loader(fileStream);
+					levels.push_back(loader.loadLevel());
+
+					logFile << timeString << " : \"" << filePath << "\" parsed successfuly!" << std::endl;
+				}
+				catch (UnexpectedTokenException e) {
+					std::string expectedType = getTokenString(e.expected);
+					std::string actualType = getTokenString(e.actual);
+					logFile << timeString << " : Syntax error in \"" << filePath << "\" | Line " << e.lineNumber << 
+						": Expected: \"" << expectedType << "\", but \"" << actualType << "\" was read!" << std::endl;
+				}
+				catch (TexureLoadFailedException e) {
+					logFile << timeString << " : Error in \"" << filePath << "\" | Line " << e.lineNumber << 
+						": Texture could not be loaded from \"" << e.path << "\"!" << std::endl;
+				}
+				catch (IdentifierException e) {
+					logFile << timeString << " : Error in \"" << filePath << "\" | Line " << e.lineNumber <<
+						": Identifier \"" << e.id << "\" of type \"" << e.type << "\" : " << e.message << std::endl;
+				}
 			}
 		}
-		*/
 	}
 
 }
