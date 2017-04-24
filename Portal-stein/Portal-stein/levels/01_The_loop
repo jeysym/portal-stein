@@ -1,0 +1,82 @@
+*TEXTURES
+brick_tex : "textures\\bricks.bmp"
+tile_tex  : "textures\\tile_floor.bmp"
+stone_tex : "textures\\stone.bmp"
+
+*COLORS
+white : (255, 255, 255)
+red   : (255, 0, 0)
+green : (0, 255, 0)
+col0 : (255, 0, 0)
+col1 : (192, 66, 0)
+col2 : (129, 129, 0)
+col3 : (66, 192, 0)
+col4 : (0, 255, 0)
+col5 : (66, 192, 0)
+col6 : (129, 129, 0)
+col7 : (192, 66, 0)
+
+*MAP
+           e     h      
+
+             f g
+a          b     
+ P
+d          c     
+             k l
+
+           m     n
+*SEGMENTS
+start : {
+    floor(stone_tex)
+    ceiling(red)
+    walls (stone_tex){ a-b[seg0]c-d- }
+}
+end : {
+    floor(stone_tex)
+    ceiling(green)
+    walls(stone_tex) { a-b[seg4]c-d- }
+}
+seg0 : {
+    floor(col0, tile_tex)
+    ceiling(col0)
+    walls(brick_tex){ m-c[start]b-e[seg1]f-k[seg7] }
+}
+seg1 : {
+    floor(col1, tile_tex)
+    ceiling(col1)
+    walls(brick_tex){ f[seg0]e-h[seg2]g- }
+}
+seg2 : {
+    floor(col2, tile_tex)
+    ceiling(col2)
+    walls(brick_tex){ g[seg1]h-n[seg3]l-g- }
+}
+seg3 : {
+    floor(col3, tile_tex)
+    ceiling(col3)
+    walls(brick_tex){ l[seg2]n-m[seg4]k-l- }
+}
+seg4 : {
+    floor(col4, tile_tex)
+    ceiling(col4)
+    walls(brick_tex){ m-c[end]b-e[seg5]f-k[seg3] }
+}
+seg5 : {
+    floor(col5, tile_tex)
+    ceiling(col5)
+    walls(brick_tex){ f[seg4]e-h[seg6]g-  }
+}
+seg6 : {
+    floor(col6, tile_tex)
+    ceiling(col6)
+    walls(brick_tex){ g[seg5]h-n[seg7]l-g- }
+}
+seg7 : {
+    floor(col7, tile_tex)
+    ceiling(col7)
+    walls(brick_tex) { l[seg6]n-m[seg0]k-l- }
+}
+
+*PLAYER
+P - (1, 0) - start
