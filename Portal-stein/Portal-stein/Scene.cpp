@@ -57,6 +57,17 @@ namespace ps {
 		segments(), camera(FloatingObjInScene(camera_, 50.0f, *this)) {
 	}
 
+	Scene::Scene(const Scene & rhs) : camera(rhs.camera), segments(rhs.segments) {
+		camera.scene = this; // repoint the camera to this scene
+	}
+
+	Scene & Scene::operator=(const Scene & rhs) {
+		segments = rhs.segments;
+		camera = rhs.camera;
+		camera.scene = this;
+		return *this;
+	}
+
 	std::size_t Scene::addSegment(Segment && segment_) {
 		segments.push_back(std::move(segment_));
 		return segments.size() - 1;
@@ -107,7 +118,7 @@ namespace ps {
 
 		LineSegment cameraLS{ toVector2(from), toVector2(to) };
 
-		auto & segment = scene.getSegment(segmentId);
+		auto & segment = scene->getSegment(segmentId);
 
 		bool cameraUnderFloor = (to.z <= (segment.segmentFloorHeight + 0.1f));
 		bool cameraAboveCeiling = (to.z >= (segment.segmentFloorHeight + segment.segmentWallHeight - 0.1f));
@@ -172,7 +183,7 @@ namespace ps {
 	}
 
 	FloatingObjInScene::FloatingObjInScene(const ObjectInScene & obj, float mass_, Scene & scene_) :
-		ObjectInScene(obj), scene(scene_), mass(mass_), force(0.0f, 0.0f, 0.0f), torque(0.0f),
+		ObjectInScene(obj), scene(&scene_), mass(mass_), force(0.0f, 0.0f, 0.0f), torque(0.0f),
 		speed(0.0f, 0.0f, 0.0f), angularSpeed(0.0f)
 	{
 	}

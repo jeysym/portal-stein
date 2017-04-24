@@ -29,7 +29,7 @@ namespace ps {
 		static sf::Shader shader;
 
 		sf::Color color;
-		sf::Texture * texture;
+		std::shared_ptr<sf::Texture> texture;
 
 	public:
 		static void compileShaders();
@@ -40,7 +40,7 @@ namespace ps {
 		// Creates colored floor/ceiling.
 		FloorCeiling(const sf::Color & color_);
 		// Creates floor/ceiling with color + texture.
-		FloorCeiling(const sf::Color & color_, sf::Texture * texture_);
+		FloorCeiling(const sf::Color & color_, std::shared_ptr<sf::Texture> texture_);
 	};
 
 

@@ -53,6 +53,6 @@ namespace ps {
 	};
 
 
-	using portalUPtr = std::unique_ptr<Portal>;
+	using portalPtr = std::shared_ptr<Portal>;
 }
 #endif // !PS_PORTAL_INCLUDED

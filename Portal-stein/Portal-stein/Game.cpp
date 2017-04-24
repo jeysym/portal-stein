@@ -1,88 +1,70 @@
-#include <memory>
 #include "Game.hpp"
-#include "Math.hpp"
-#include "SegmentBuilder.hpp"
-#include "FloorCeiling.hpp"
+#include <memory>
 #include <filesystem>
+#include <fstream>
+
+#include "Math.hpp"
+#include "LevelLoader.hpp"
+//#include "SegmentBuilder.hpp"
+//#include "FloorCeiling.hpp"
 
 namespace ps {
 
-	sf::Texture wallTex;
-	sf::Texture metalTex;
-	sf::Texture floorTex;
-	sf::Texture ceilingTex;
+	//sf::Texture wallTex;
+	//sf::Texture metalTex;
+	//sf::Texture floorTex;
+	//sf::Texture ceilingTex;
 
-	std::shared_ptr<Scene> makeTestScene() {
-		wallTex.loadFromFile("levels\\textures\\wall.bmp");
-		metalTex.loadFromFile("levels\\textures\\metal.bmp");
-		floorTex.loadFromFile("levels\\textures\\floor.bmp");
-		ceilingTex.loadFromFile("levels\\textures\\ceiling.bmp");
+	//std::shared_ptr<Scene> makeTestScene() {
+	//	wallTex.loadFromFile("levels\\textures\\wall.bmp");
+	//	metalTex.loadFromFile("levels\\textures\\metal.bmp");
+	//	floorTex.loadFromFile("levels\\textures\\floor.bmp");
+	//	ceilingTex.loadFromFile("levels\\textures\\ceiling.bmp");
 
-		sf::Vector2f a(0.0f, 0.0f);
-		sf::Vector2f b(0.0f, 10.0f);
-		sf::Vector2f c(10.0f, 10.0f);
-		sf::Vector2f d(10.0f, 0.0f);
+	//	sf::Vector2f a(0.0f, 0.0f);
+	//	sf::Vector2f b(0.0f, 10.0f);
+	//	sf::Vector2f c(10.0f, 10.0f);
+	//	sf::Vector2f d(10.0f, 0.0f);
 
-		sf::Vector2f offset(40.0f, 0.0f);
-		sf::Vector2f e = a + offset;
-		sf::Vector2f f = b + offset;
-		sf::Vector2f g = c + offset;
-		sf::Vector2f h = d + offset;
+	//	sf::Vector2f offset(40.0f, 0.0f);
+	//	sf::Vector2f e = a + offset;
+	//	sf::Vector2f f = b + offset;
+	//	sf::Vector2f g = c + offset;
+	//	sf::Vector2f h = d + offset;
 
-		Floor floor(sf::Color::White, &floorTex);
-		Ceiling ceiling(sf::Color::White, &ceilingTex);
+	//	Floor floor(sf::Color::White, &floorTex);
+	//	Ceiling ceiling(sf::Color::White, &ceilingTex);
 
-		SegmentBuilder segment0( floor, ceiling );
-		segment0.addWall(PortalWall(a, b, sf::Color::Green));
-		segment0.addWall(PortalWall(b, c, sf::Color::White, &wallTex));
-		segment0.addWall(makeWallPortalWall(LineSegment(c, d), LineSegment(g, f), 1));
-		segment0.addWall(PortalWall(d, a, sf::Color::Green));
+	//	SegmentBuilder segment0( floor, ceiling );
+	//	segment0.addWall(PortalWall(a, b, sf::Color::Green));
+	//	segment0.addWall(PortalWall(b, c, sf::Color::White, &wallTex));
+	//	segment0.addWall(makeWallPortalWall(LineSegment(c, d), LineSegment(g, f), 1));
+	//	segment0.addWall(PortalWall(d, a, sf::Color::Green));
 
-		SegmentBuilder segment1(floor, ceiling);
-		segment1.addWall(PortalWall(e, f, sf::Color::Yellow));
-		segment1.addWall(makeWallPortalWall(LineSegment(f, g), LineSegment(d, c), 0));
-		segment1.addWall(PortalWall(g, h, sf::Color::Yellow));
-		segment1.addWall(PortalWall(h, e, sf::Color::Yellow));
+	//	SegmentBuilder segment1(floor, ceiling);
+	//	segment1.addWall(PortalWall(e, f, sf::Color::Yellow));
+	//	segment1.addWall(makeWallPortalWall(LineSegment(f, g), LineSegment(d, c), 0));
+	//	segment1.addWall(PortalWall(g, h, sf::Color::Yellow));
+	//	segment1.addWall(PortalWall(h, e, sf::Color::Yellow));
 
-		auto result = std::make_shared<Scene>(
-			ObjectInScene(sf::Vector3f(1.0f, 1.0f, 0.5f), sf::Vector2f(1.0f, 1.0f), 0)
-		);
-		
-		result->addSegment(segment0.finalize());
-		result->addSegment(segment1.finalize());
-		return result;
-	}
+	//	auto result = std::make_shared<Scene>(
+	//		ObjectInScene(sf::Vector3f(1.0f, 1.0f, 0.5f), sf::Vector2f(1.0f, 1.0f), 0)
+	//	);
+	//	
+	//	result->addSegment(segment0.finalize());
+	//	result->addSegment(segment1.finalize());
+	//	return result;
+	//}
 
-/*
-	void Game::drawInfo(sf::RenderWindow & window, RayCaster & caster, float secondsElapsed)
-	{
-		sf::Text info{ "N/A", textFont };
-		info.setFillColor(sf::Color::Black);
-		info.setStyle(sf::Text::Bold);
-
-		auto position = caster.camera.getPosition();
-		auto direction = caster.camera.getDirection();
-		auto segmentId = caster.camera.getSegmentId();
-
-		info.setString(
-			"pos = (" + std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z) + ")\n" +
-			"dir = (" + std::to_string(direction.x) + "," + std::to_string(direction.y) + ")\n" +
-			"segment = " + std::to_string(segmentId) + "\n" +
-			"fps = " + std::to_string((int)(1.0f / secondsElapsed))
-		);
-
-		window.draw(info);
-	}
-*/
-
-	void Game::simulateDrag(Scene & scene)
-	{
+	void Game::simulateDrag(Scene & scene) {
 		auto speed = scene.camera.getSpeed();
 		auto angularSpeed = scene.camera.getAngularSpeed();
 
-		auto walkDrag = -walkDragCoefficient1 * speed - walkDragCoefficient2 * norm(speed) * speed;
+		auto walkDrag = -1.0f * walkDragCoefficient1 * speed - walkDragCoefficient2 * norm(speed) * speed;
+		auto rotateDrag = -1.0f * angularSpeed * rotateDragCoefficient;
+
 		scene.camera.applyForce(walkDrag);
-		scene.camera.applyTorque(-1.0f * angularSpeed * rotateDragCoefficient);
+		scene.camera.applyTorque(rotateDrag);
 	}
 
 	void Game::processUserInput(sf::RenderWindow & window, Scene & scene, float deltaTime)
@@ -141,7 +123,7 @@ namespace ps {
 			throw std::runtime_error("Font " + pathToFont + " could not be loaded!");
 	}
 
-	Game::Game()
+	Game::Game() : levels()
 	{
 		// Floor ceiling must have its shaders compiled before the game starts.
 		FloorCeiling::compileShaders();
@@ -180,34 +162,58 @@ namespace ps {
 	void Game::run()
 	{
 		RayCaster caster;
-		
-		auto scene = makeTestScene();
-		
+				
 		unsigned int wWidth = 800;
 		unsigned int wHeight = 600;
 		sf::RenderWindow window( sf::VideoMode( wWidth, wHeight ), "Portal-stein" );
 		window.setVerticalSyncEnabled(true);
 
-		// get the clock object
-		sf::Clock clock;
-		float deltaTime = 0.001f;
+		for (Level & level : levels) {
+			auto && scene = level.makeScene();
 
-		while (window.isOpen())
-		{
-			// measure the time elapsed from the last draw
-			deltaTime = clock.getElapsedTime().asSeconds();
-			clock.restart();
+			// get the clock object
+			sf::Clock clock;
+			float deltaTime = 0.001f;
 
-			processUserInput(window, *scene, deltaTime);
-			simulateDrag(*scene);
-			scene->camera.simulate(deltaTime);
+			while (window.isOpen())
+			{
+				// measure the time elapsed from the last draw
+				deltaTime = clock.getElapsedTime().asSeconds();
+				clock.restart();
 
-			window.clear(sf::Color::Black);				// clear the window
-			caster.render(window, *scene);				// render the game
-			drawInfo(window, *scene, deltaTime);		// draw some additional info
+				processUserInput(window, scene, deltaTime);
+				simulateDrag(scene);
+				scene.camera.simulate(deltaTime);
 
-			window.display();
+				window.clear(sf::Color::Black);			// clear the window
+				caster.render(window, scene);			// render the game
+				drawInfo(window, scene, deltaTime);		// draw some additional info like position, direction, fps
+
+				window.display();
+			}
 		}
+	}
+
+	void Game::loadLevels(const std::string & levelDirPath) {
+		std::ifstream fileStream;
+		fileStream.open("levels\\test");	// HACK: temporary 
+
+		LevelLoader loader(fileStream);
+		levels.push_back(loader.loadLevel());
+
+		/*
+		using namespace std::experimental::filesystem;
+
+		for (const path & file : directory_iterator(levelDirPath)) {
+			if (is_regular_file(file)) {
+				std::ifstream fileStream;
+				fileStream.open(file.string());
+
+				LevelLoader loader(fileStream);
+				levels.push_back(loader.loadLevel());
+			}
+		}
+		*/
 	}
 
 }

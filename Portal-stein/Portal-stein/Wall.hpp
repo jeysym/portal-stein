@@ -31,7 +31,7 @@ namespace ps {
 	class Wall {
 	private:
 		sf::Color color;
-		sf::Texture * texture;
+		std::shared_ptr<sf::Texture> texture;
 
 	public:
 		sf::Vector2f from;
@@ -40,7 +40,7 @@ namespace ps {
 		// Creates a colored wall.
 		Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color);
 		// Creates a wall with color + texture. 
-		Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color, sf::Texture * texture);
+		Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color, std::shared_ptr<sf::Texture> texture);
 
 		// Draws the wall on render target, according to draw parameters that were passed.
 		void draw(sf::RenderTarget & rt, const WallDrawParameters & params) const;
@@ -57,21 +57,26 @@ namespace ps {
 
 	class PortalWall : public Wall {
 	private:
-		portalUPtr portal;
+		portalPtr portal;
 
 	public:
 
 		// Creates a colored wall.
 		PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color);
 		// Creates a wall with color + texture.
-		PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color, sf::Texture * texture);
+		PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color, std::shared_ptr<sf::Texture> texture);
+
+		PortalWall(const PortalWall & rs) = default;
+		PortalWall(PortalWall && rs) = default;
+		PortalWall & operator=(const PortalWall & rs) = default;
+		PortalWall & operator=(PortalWall && rs) = default;
 
 		// Returns true if this wall has portal on it.
 		bool isPortal() const;
 		// Takes object and passes it through portal.
 		void stepThrough(ObjectInScene & obj) const;
 		// Sets portal for this wall.
-		void setPortal(portalUPtr && portal);
+		void setPortal(const portalPtr & portal);
 	};
 
 

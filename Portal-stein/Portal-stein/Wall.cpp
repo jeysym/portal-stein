@@ -6,7 +6,7 @@ namespace ps {
 	Wall::Wall(sf::Vector2f from, sf::Vector2f to, sf::Color color) : Wall(from, to, color, nullptr) {
 	}
 
-	Wall::Wall(sf::Vector2f from_, sf::Vector2f to_, sf::Color color_, sf::Texture * texture_) : from(from_), to(to_), color(color_), texture(texture_) {
+	Wall::Wall(sf::Vector2f from_, sf::Vector2f to_, sf::Color color_, std::shared_ptr<sf::Texture> texture_) : from(from_), to(to_), color(color_), texture(texture_) {
 		if (texture != nullptr)
 			texture->setRepeated(true);
 	}
@@ -34,7 +34,7 @@ namespace ps {
 			vertexArr[1] = sf::Vertex(params.scrWallBottom, color);
 		}
 
-		rt.draw(vertexArr, texture);
+		rt.draw(vertexArr, texture.get());
 	}
 
 	float Wall::getWidth() const
@@ -42,14 +42,14 @@ namespace ps {
 		return norm(to - from);
 	}
 
-	void PortalWall::setPortal(portalUPtr && portal_) {
-		portal = std::move(portal_);
+	void PortalWall::setPortal(const portalPtr & portal_) {
+		portal = portal_;
 	}
 
 	PortalWall::PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color) : PortalWall(from, to, color, nullptr) {
 	}
 
-	PortalWall::PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color, sf::Texture * texture) : Wall(from, to, color, texture), portal(nullptr) {
+	PortalWall::PortalWall(sf::Vector2f from, sf::Vector2f to, sf::Color color, std::shared_ptr<sf::Texture> texture) : Wall(from, to, color, texture), portal(nullptr) {
 	}
 
 	bool PortalWall::isPortal() const
@@ -94,7 +94,7 @@ namespace ps {
 
 	PortalWall makeDoorWall(sf::Vector2f from_, sf::Vector2f to_, std::size_t targetSegment_) {
 		PortalWall result(from_, to_, sf::Color::White);
-		portalUPtr portal_ = std::make_unique<Door>(targetSegment_);
+		portalPtr portal_ = std::make_unique<Door>(targetSegment_);
 		result.setPortal(std::move(portal_));
 		return std::move(result);
 	}
@@ -102,7 +102,7 @@ namespace ps {
 	PortalWall makeWallPortalWall(LineSegment wallFrom, LineSegment wallTo, std::size_t targetSegment_) 
 	{
 		PortalWall result(wallFrom.getFrom(), wallFrom.getTo(), sf::Color::White);
-		portalUPtr portal_ = std::make_unique<WallPortal>(wallFrom, wallTo, targetSegment_);
+		portalPtr portal_ = std::make_unique<WallPortal>(wallFrom, wallTo, targetSegment_);
 		result.setPortal(std::move(portal_));
 		return result;
 	}

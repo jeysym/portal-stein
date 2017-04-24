@@ -157,6 +157,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="SegmentBuilder.cpp" />
     <ClCompile Include="Wall.cpp" />
     <ClCompile Include="FloorCeiling.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Geometry.hpp" />
     <ClInclude Include="Level.hpp" />
     <ClInclude Include="LevelLoader.hpp" />
+    <ClInclude Include="Lexer.hpp" />
     <ClInclude Include="SegmentBuilder.hpp" />
     <ClInclude Include="Solve.hpp" />
     <ClInclude Include="Wall.hpp" />
@@ -182,6 +184,7 @@
     <ClInclude Include="ObjectInScene.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="sfml-graphics-2.dll" />
     <None Include="sfml-graphics-d-2.dll" />
     <None Include="sfml-system-2.dll" />

@@ -50,14 +50,15 @@ namespace ps {
 		Floor floor;
 		Ceiling ceiling;
 
-		Segment(const Segment & obj) = delete;
+		Segment(const Segment & obj) = default;
 		Segment(Segment && obj) = default;
-		Segment& operator=(const Segment & obj) = delete;
+		Segment& operator=(const Segment & obj) = default;
 		Segment& operator=(Segment && obj) = default;
 
 		const std::vector<PortalWall> & getWalls() const;
 		
 		friend class SegmentBuilder;
+		friend class LevelLoader;
 	};
 
 
@@ -77,7 +78,7 @@ namespace ps {
 		float angularSpeed;
 
 		float mass;
-		Scene & scene;
+		Scene * scene;
 
 	public:
 		virtual void rotate(float angle) override;
@@ -91,6 +92,8 @@ namespace ps {
 		float getAngularSpeed() const;
 
 		FloatingObjInScene(const ObjectInScene & obj, float mass_, Scene & scene_);
+
+		friend class Scene;
 	};
 
 
@@ -134,6 +137,13 @@ namespace ps {
 		Camera camera;
 
 		Scene(const ObjectInScene & camera_);
+		Scene(const Scene & rhs);
+		Scene & operator=(const Scene & rhs);
+
+		/*Scene(const Scene & rs) = default;
+		Scene(Scene && rs) = default;
+		Scene & operator=(const Scene & rs) = default;
+		Scene & operator=(Scene && rs) = default;*/
 
 		// Adds a new segment. Its unique id is returned.
 		std::size_t addSegment(Segment && segment_);
@@ -141,6 +151,8 @@ namespace ps {
 		Segment& getSegment(std::size_t segmentId);
 
 		const Segment& getSegment(std::size_t segmentId) const;
+
+		friend class Level;
 	};
 
 

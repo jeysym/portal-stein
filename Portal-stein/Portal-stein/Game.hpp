@@ -2,16 +2,14 @@
 #ifndef PS_GAME_INCLUDED
 #define PS_GAME_INCLUDED
 #include "RayCaster.hpp"
+#include "Level.hpp"
+#include <vector>
 
 namespace ps {
 
 	class Game {
 	private:
-		
-		/*
-		void applyDragToCamera(RayCaster & caster);
-		void drawInfo(sf::RenderWindow & window, RayCaster & caster, float secondsElapsed);
-		*/
+		std::vector<Level> levels;
 
 		void simulateDrag(Scene & scene);
 		void processUserInput(sf::RenderWindow & window, Scene & caster, float deltaTime);
@@ -29,7 +27,7 @@ namespace ps {
 		float rotateDragCoefficient;
 
 		void run();
-		void loadLevels();
+		void loadLevels(const std::string & levelDirPath);
 	};
 }
 

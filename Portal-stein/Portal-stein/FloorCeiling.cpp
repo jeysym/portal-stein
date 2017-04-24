@@ -44,26 +44,34 @@ namespace ps {
 	}
 
 	void FloorCeiling::draw(sf::RenderTarget & rt, const FloorCeilingDrawParameters & params) const {
-		shader.setUniform("hD", params.deltaH);
-		shader.setUniform("from", params.uvCamera);
-		shader.setUniform("dir", params.uvDirection);
+		if (texture) {
+			shader.setUniform("hD", params.deltaH);
+			shader.setUniform("from", params.uvCamera);
+			shader.setUniform("dir", params.uvDirection);
 
-		shader.setUniform("vpDistance", params.viewPlaneDistance);
+			shader.setUniform("vpDistance", params.viewPlaneDistance);
 
-		sf::VertexArray arr(sf::Lines, 2);
-		arr[0] = sf::Vertex(params.scrTop, color, sf::Vector2f(params.vpTop, 1.0f));
-		arr[1] = sf::Vertex(params.scrBottom, color, sf::Vector2f(params.vpBottom, 1.0f));
-	
-		sf::RenderStates states;
-		states.shader = &shader;
-		states.texture = texture;
-		rt.draw(arr, states);
+			sf::VertexArray arr(sf::Lines, 2);
+			arr[0] = sf::Vertex(params.scrTop, color, sf::Vector2f(params.vpTop, 1.0f));
+			arr[1] = sf::Vertex(params.scrBottom, color, sf::Vector2f(params.vpBottom, 1.0f));
+
+			sf::RenderStates states;
+			states.shader = &shader;
+			states.texture = texture.get();
+			rt.draw(arr, states);
+		}
+		else {
+			sf::VertexArray arr(sf::Lines, 2);
+			arr[0] = sf::Vertex(params.scrTop, color);
+			arr[1] = sf::Vertex(params.scrBottom, color);
+			rt.draw(arr);
+		}	
 	}
 
-	FloorCeiling::FloorCeiling(const sf::Color & color_) : FloorCeiling(color, nullptr)	{
+	FloorCeiling::FloorCeiling(const sf::Color & color_) : FloorCeiling(color_, nullptr)	{
 	}
 
-	FloorCeiling::FloorCeiling(const sf::Color & color_, sf::Texture * texture_) : color(color_), texture(texture_) {
+	FloorCeiling::FloorCeiling(const sf::Color & color_, std::shared_ptr<sf::Texture> texture_) : color(color_), texture(texture_) {
 		if (texture != nullptr)
 			texture->setRepeated(true);
 	}
