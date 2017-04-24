@@ -1,0 +1,49 @@
+*TEXTURES
+floor_tex : "textures\floor.bmp"
+ceiling_tex : "textures\ceiling.bmp"
+wall_tex : "textures\wall.bmp"
+
+*COLORS
+red : (255, 0, 0)
+blue : (0, 0, 255)
+
+*VERTICES
+vert0 : (54, 65)
+vert1 : (56.9, 124.2)
+
+*MAP
+a    b    h
+ P
+     c
+
+     d
+
+f    e    i
+
+*SEGMENTS
+redLeft : {
+    floor(red) 
+    ceiling(ceiling_tex)
+    walls : (wall_tex){ a(blue)b-c[blueRight]d-e-f }
+}
+
+redRight : {
+    floor(blue)
+    ceiling(ceiling_tex)
+    walls : (wall_tex){ h-i-e-d[blueLeft]c-b }
+}
+
+blueLeft : {
+    floor(blue)
+    ceiling(ceiling_tex)
+    walls : { a-b-c[redRight]d-e-f }
+}
+
+blueRight : {
+    floor : colored(0, 0, 255)
+    ceiling : textured(ceiling_tex)
+    walls : { b-h-i-e-d[redLeft]c }
+}
+
+*PLAYER
+P - (1, -1) - redLeft

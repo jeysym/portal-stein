@@ -1,0 +1,55 @@
+# texture definitions go here
+*TEXTURES
+brick_tex : "textures\\bricks.bmp"
+metal_tex : "textures\\metal.bmp"
+stone_tex : "textures\\stone.bmp" # this is a comment, yay
+tile_tex  : "textures\\tile_floor.bmp"
+
+# color definitnions go here
+*COLORS
+red : (255,0,0)
+blue: (0,0,255)
+green:(0,255,0)
+yellow:
+(255, 
+	255,0
+) # no problem for the parser
+
+# vertices can be defined with a map
+*MAP
+a     b     f
+ P   
+              
+      c
+      d
+        
+
+i     e     g
+*SEGMENTS
+redLeft : {
+    floor(tile_tex) 
+    ceiling(red, metal_tex)
+    walls(brick_tex){ a-b[greenRight]c-d[yellowRight]e-i- }
+}
+
+blueLeft : {
+    floor(metal_tex)
+    ceiling(blue)
+    walls(stone_tex){ a-b[yellowRight]c-d[greenRight]e-i- }
+}
+
+greenRight : {
+    floor(green, tile_tex) # texture can be modulated with color
+    ceiling(green)
+    walls(stone_tex){ c[redLeft]b-f-g-e[blueLeft]d- }
+}
+
+yellowRight : {
+    floor(yellow, tile_tex)
+    ceiling(yellow)
+    walls(brick_tex){ c[redLeft]b-f-g-e[blueLeft]d- }
+}
+
+# initial position of player
+*PLAYER
+P - (1, -1) - redLeft
