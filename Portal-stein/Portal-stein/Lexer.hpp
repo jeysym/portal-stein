@@ -23,6 +23,14 @@ namespace ps {
 		virtual const char * what() const override;
 	};
 
+	class OpenStringLiteralException : public std::exception {
+	public:
+		int lineNumber;
+
+		OpenStringLiteralException(int lineNumber);
+		virtual const char * what() const override;
+	};
+
 
 	//*********************************************
 	// TOKENS

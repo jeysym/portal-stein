@@ -11,6 +11,14 @@ namespace ps {
 		return "Unexpected token encountered while reading the input!";
 	}
 
+	OpenStringLiteralException::OpenStringLiteralException(int lineNumber_) : lineNumber(lineNumber_) {
+	}
+
+	const char * OpenStringLiteralException::what() const {
+		return "Left quote of string was not found!";
+	}
+
+
 	inline bool isWhite(char c) {
 		return (c == '\n' || c == ' ' || c == '\t' || c == '\r' || c == '\v');
 	}
@@ -86,7 +94,7 @@ namespace ps {
 		std::string result;
 		bool escape = false;
 		char c;
-		while (c = input.get()) {
+		while (input.get(c)) {
 			if (c == '\n')
 				lineNumber++;
 
@@ -108,8 +116,7 @@ namespace ps {
 		}
 
 		// This case happens when end-of-file (or some error) is encountered while searching for right "
-		// TODO : maybe throw exception...
-		return "";
+		throw OpenStringLiteralException(lineNumber);
 	}
 
 	std::string Lexer::readIdentifier()
@@ -117,7 +124,7 @@ namespace ps {
 		std::string result;
 
 		char c;
-		while (c = input.get()) {
+		while (input.get(c)) {
 			if (isIDLetter(c)) {
 				result.push_back(c);
 			}
@@ -126,6 +133,8 @@ namespace ps {
 				return result;
 			}
 		}
+
+		return result;
 	}
 
 	Lexer::Lexer(std::istream & input_) : input(input_), lineNumber(1), lookahead(-1, -1)
@@ -209,7 +218,7 @@ namespace ps {
 			number.push_back(c);
 			bool floatNum = false;
 
-			while (c = input.get()) {
+			while (input.get(c)) {
 				if (isNum(c)) {
 					number.push_back(c);
 				}

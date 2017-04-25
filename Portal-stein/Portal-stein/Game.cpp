@@ -9,52 +9,6 @@
 
 namespace ps {
 
-	//sf::Texture wallTex;
-	//sf::Texture metalTex;
-	//sf::Texture floorTex;
-	//sf::Texture ceilingTex;
-
-	//std::shared_ptr<Scene> makeTestScene() {
-	//	wallTex.loadFromFile("levels\\textures\\wall.bmp");
-	//	metalTex.loadFromFile("levels\\textures\\metal.bmp");
-	//	floorTex.loadFromFile("levels\\textures\\floor.bmp");
-	//	ceilingTex.loadFromFile("levels\\textures\\ceiling.bmp");
-
-	//	sf::Vector2f a(0.0f, 0.0f);
-	//	sf::Vector2f b(0.0f, 10.0f);
-	//	sf::Vector2f c(10.0f, 10.0f);
-	//	sf::Vector2f d(10.0f, 0.0f);
-
-	//	sf::Vector2f offset(40.0f, 0.0f);
-	//	sf::Vector2f e = a + offset;
-	//	sf::Vector2f f = b + offset;
-	//	sf::Vector2f g = c + offset;
-	//	sf::Vector2f h = d + offset;
-
-	//	Floor floor(sf::Color::White, &floorTex);
-	//	Ceiling ceiling(sf::Color::White, &ceilingTex);
-
-	//	SegmentBuilder segment0( floor, ceiling );
-	//	segment0.addWall(PortalWall(a, b, sf::Color::Green));
-	//	segment0.addWall(PortalWall(b, c, sf::Color::White, &wallTex));
-	//	segment0.addWall(makeWallPortalWall(LineSegment(c, d), LineSegment(g, f), 1));
-	//	segment0.addWall(PortalWall(d, a, sf::Color::Green));
-
-	//	SegmentBuilder segment1(floor, ceiling);
-	//	segment1.addWall(PortalWall(e, f, sf::Color::Yellow));
-	//	segment1.addWall(makeWallPortalWall(LineSegment(f, g), LineSegment(d, c), 0));
-	//	segment1.addWall(PortalWall(g, h, sf::Color::Yellow));
-	//	segment1.addWall(PortalWall(h, e, sf::Color::Yellow));
-
-	//	auto result = std::make_shared<Scene>(
-	//		ObjectInScene(sf::Vector3f(1.0f, 1.0f, 0.5f), sf::Vector2f(1.0f, 1.0f), 0)
-	//	);
-	//	
-	//	result->addSegment(segment0.finalize());
-	//	result->addSegment(segment1.finalize());
-	//	return result;
-	//}
-
 	void Game::simulateDrag(Scene & scene) {
 		auto speed = scene.camera.getSpeed();
 		auto angularSpeed = scene.camera.getAngularSpeed();
@@ -220,19 +174,23 @@ namespace ps {
 
 					fileStream.close();
 				}
-				catch (UnexpectedTokenException e) {
+				catch (UnexpectedTokenException & e) {
 					std::string expectedType = getTokenString(e.expected);
 					std::string actualType = getTokenString(e.actual);
 					logFile << timeString << " : Syntax error in \"" << filePath << "\" | Line " << e.lineNumber << 
 						": Expected: \"" << expectedType << "\", but \"" << actualType << "\" was read!" << std::endl;
 				}
-				catch (TexureLoadFailedException e) {
+				catch (TexureLoadFailedException & e) {
 					logFile << timeString << " : Error in \"" << filePath << "\" | Line " << e.lineNumber << 
 						": Texture could not be loaded from \"" << e.path << "\"!" << std::endl;
 				}
-				catch (IdentifierException e) {
+				catch (IdentifierException & e) {
 					logFile << timeString << " : Error in \"" << filePath << "\" | Line " << e.lineNumber <<
 						": Identifier \"" << e.id << "\" of type \"" << e.type << "\" : " << e.message << std::endl;
+				}
+				catch (OpenStringLiteralException & e) {
+					logFile << timeString << " : Error in \"" << filePath << "\" | Line " << e.lineNumber <<
+						": Ending quote of string literal was not found!" << std::endl;
 				}
 			}
 		}
