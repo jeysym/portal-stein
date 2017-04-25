@@ -49,6 +49,9 @@ namespace ps {
 		float getWidth() const;
 		// Returns true if the wall faces the ray. Returning false means this wall is not visible by that ray.
 		bool facesRay(const Ray & ray) const;
+		// Returns signed distance (positive on the inside of segment) of the point from the wall. Distance is handled correctly even for points, for which 
+		// the least distant point of the wall is one of the wall's vertices.
+		float distanceFromWall(const sf::Vector2f & point) const;
 		// Intersects the wall with a ray. Intersection is returned as out parameter.
 		bool intersect(const Ray & ray, WallIntersection & intersection) const;
 		// Returns true if line segment intersects the wall.

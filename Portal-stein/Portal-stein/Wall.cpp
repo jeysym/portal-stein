@@ -73,6 +73,29 @@ namespace ps {
 		return (0 < crossProduct);
 	}
 
+	float Wall::distanceFromWall(const sf::Vector2f & point) const
+	{
+		sf::Vector2f r = to - from;
+		float rDotR = dot(r, r);
+		sf::Vector2f normal(r.y, -r.x);	// perpendicular vector to r
+
+		// "from" is put into coordinate system center
+		sf::Vector2f x = point - from;
+		float rDot = dot(r, x);
+		if (rDot < 0) {
+			// returns distance from "from" (x == point - from)
+			return norm(x);
+		} 
+		else if (rDot > rDotR) {
+			// returns distance from "to" (x - r == point - to)
+			return norm(x - r);
+		}
+		else {
+			// return distance of point x from line segment "from"-"to"
+			return (1 / norm(normal)) * dot(normal, x);
+		}
+	}
+
 	bool Wall::intersect(const Ray & ray, WallIntersection & intersection) const
 	{
 		auto lineSegmentIntersection = ps::intersect(ray, LineSegment(from, to));

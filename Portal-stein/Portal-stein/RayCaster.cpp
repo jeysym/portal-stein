@@ -104,10 +104,10 @@ namespace ps {
 				wallStrip.bottom = scrWallBottom;
 
 				if (wall.isPortal()) {
-					RenderRay rayCopy = ray;										// get a copy of the viewing ray
-					wall.stepThrough(rayCopy);										// copy of ray steps through portal
-					rayCopy.renderFromDistance = distance;							// this new ray render from the hit wall onwards
-					renderStip(wallStrip, rayCopy, recursionDepth + 1);				// edge (segment behind it) is drawn
+					RenderRay rayCopy = ray;												// get a copy of the viewing ray
+					wall.stepThrough(rayCopy);												// copy of ray steps through portal
+					rayCopy.renderFromDistance = getMax(distance, ray.renderFromDistance);	// this new ray render from the hit wall onwards
+					renderStip(wallStrip, rayCopy, recursionDepth + 1);						// edge (segment behind it) is drawn
 				}
 				else {
 					WallDrawParameters drawParams;
@@ -120,6 +120,12 @@ namespace ps {
 
 					wall.draw(*renderTarget, drawParams);
 				}
+
+				// too close wall => do not render floor and ceiling
+				// distance close to zero introduce numerical unstability when dividing by distance, this leads to problems
+				// however when ray is so close to the wall, he probably can't even see the floor or ceiling
+				if (distance < ray.renderFromDistance)
+					continue;
 
 				float ceilDH = wallTopHeight - ray.getPosition().z;
 				float vpCeilingTop = ceilDH / (ray.renderFromDistance * ray.correctionFactor);

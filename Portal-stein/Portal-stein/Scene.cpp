@@ -128,20 +128,27 @@ namespace ps {
 			return;
 		}
 
-		// check whether the camera didn't pass through wall
+		// check whether the camera didn't get too close to solid wall
 		for (auto & wall : segment.getWalls()) {
-			if (wall.intersect(cameraLS)) {
-				// camera would move through the wall
-				if (wall.isPortal()) {
-					// camera steps through the portal
-					wall.stepThrough(*this);
-					return;
-				}
-				else {
-					// camera wants to pass solid wall => put it back
+			if (wall.isPortal() == false) {
+				// solid wall
+				float minimalDistanceToWall = 0.1f;
+				float distanceToWall = wall.distanceFromWall(toVector2(to));
+
+				if (distanceToWall < minimalDistanceToWall) {
+					// camera too close to solid wall => put it back
 					position = from;
 					return;
 				}
+			}
+		}
+
+		// now check for possible step through portal
+		for (auto & wall : segment.getWalls()) {
+			if (wall.isPortal() && wall.intersect(cameraLS)) {
+				// camera steps through the portal
+				wall.stepThrough(*this);
+				return;
 			}
 		}
 	}
