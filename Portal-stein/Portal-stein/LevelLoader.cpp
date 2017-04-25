@@ -31,7 +31,7 @@ namespace ps {
 	LevelLoader::LevelLoader(std::istream & input_) : 
 		lexer(input_), 
 		namedTextures("Texture"), namedColors("Color"), namedVertices("Vertex"), namedSegments("Segment"), 
-		player(sf::Vector3f{ 0.0f, 0.0f, 0.0f }, sf::Vector2f{ 1.0f, 0.0f }, 0),
+		initialPlayer(sf::Vector3f{ 0.0f, 0.0f, 0.0f }, sf::Vector2f{ 1.0f, 0.0f }, 0),
 		defaultFloor(sf::Color::Blue), defaultCeiling(sf::Color::Green)
 	{
 	}
@@ -173,7 +173,7 @@ namespace ps {
 		}
 	}
 
-	void LevelLoader::loadColorTexture(sf::Color & color_, std::shared_ptr<sf::Texture> & texture_)
+	void LevelLoader::colorAndTexture(sf::Color & color_, std::shared_ptr<sf::Texture> & texture_)
 	{
 		// default values
 		color_ = sf::Color::White;
@@ -206,27 +206,68 @@ namespace ps {
 		lexer.eat(TokenType::RPAR);
 	}
 
-	void LevelLoader::loadFloorAttribute(SegmentBuilder & builder)
+	void LevelLoader::floorAttribute(SegmentBuilder & builder)
 	{
 		sf::Color color;
 		std::shared_ptr<sf::Texture> texture;
-		loadColorTexture(color, texture);
+		colorAndTexture(color, texture);
 		builder.setFloor(Floor(color, texture));
 	}
 
-	void LevelLoader::loadCeilingAttribute(SegmentBuilder & builder)
+	void LevelLoader::ceilingAttribute(SegmentBuilder & builder)
 	{
 		sf::Color color;
 		std::shared_ptr<sf::Texture> texture;
-		loadColorTexture(color, texture);
+		colorAndTexture(color, texture);
 		builder.setCeiling(Ceiling(color, texture));
 	}
 
-	enum class PortalType {
-		NONE, DOOR, WALL_PORTAL
-	};
+	LevelLoader::LoadedPortal LevelLoader::portal()
+	{
+		LoadedPortal portal;
 
-	void LevelLoader::loadWallsAttribute(SegmentBuilder & builder)
+		lexer.eat(TokenType::LBRA);
+		Token idToken = lexer.eat(TokenType::ID);
+
+		portal.type = PortalType::DOOR;
+		portal.targetSegment = getSegment(idToken).id;
+
+		if (lexer.lookahead.type == TokenType::MINUS) {
+			// portal transports the object to some wall
+			lexer.eat(TokenType::MINUS);
+			portal.to0 = vertex();
+			lexer.eat(TokenType::MINUS);
+			portal.to1 = vertex();
+			portal.type = PortalType::WALL_PORTAL;
+		}
+
+		lexer.eat(TokenType::RBRA);
+		return portal;
+	}
+
+	void LevelLoader::wallModifier(sf::Color & color, std::shared_ptr<sf::Texture>& texture, LoadedPortal & portal_)
+	{
+		if (lexer.lookahead.type == TokenType::MINUS) {
+			// wall has no modifiers
+			lexer.eat(TokenType::MINUS);
+		}
+		else {
+			// wall has some modifiers in this format:
+			//       (color, texture)[portal]
+
+			if (lexer.lookahead.type == TokenType::LPAR) {
+				// wall has appearance modifiers
+				colorAndTexture(color, texture);
+			}
+
+			if (lexer.lookahead.type == TokenType::LBRA) {
+				// wall has portal modifier		
+				portal_ = portal();
+			}
+		}
+	}
+
+	void LevelLoader::wallsAttribute(SegmentBuilder & builder)
 	{
 		sf::Color defaultColor = sf::Color::Red;
 		std::shared_ptr<sf::Texture> defaultTexture = nullptr;
@@ -236,7 +277,7 @@ namespace ps {
 		//      (color)
 		//      (texture)
 		if (lexer.lookahead.type == TokenType::LPAR) {
-			loadColorTexture(defaultColor, defaultTexture);
+			colorAndTexture(defaultColor, defaultTexture);
 		}
 
 		// Walls format:
@@ -251,43 +292,8 @@ namespace ps {
 			std::shared_ptr<sf::Texture> currentTexture = defaultTexture;
 			portalPtr currentPortal = nullptr;
 
-			PortalType portalType = PortalType::NONE;
-			std::size_t targetSegmentId = -1;
-			sf::Vector2f to0, to1;
-
-			if (lexer.lookahead.type == TokenType::MINUS) {
-				// wall has no modifiers
-				lexer.eat(TokenType::MINUS);
-			}
-			else {
-				// wall has some modifiers in this format:
-				//       (color, texture)[portal]
-				
-				if (lexer.lookahead.type == TokenType::LPAR) {
-					// wall has appearance modifiers
-					loadColorTexture(currentColor, currentTexture);
-				}
-
-				if (lexer.lookahead.type == TokenType::LBRA) {
-					// wall has portal modifier
-					lexer.eat(TokenType::LBRA);
-					Token idToken = lexer.eat(TokenType::ID);
-					targetSegmentId = getSegment(idToken).id;
-					portalType = PortalType::DOOR;
-
-					if (lexer.lookahead.type == TokenType::MINUS) {
-						// portal transports the object to some wall
-						lexer.eat(TokenType::MINUS);
-						to0 = vertex();
-						lexer.eat(TokenType::MINUS);
-						to1 = vertex();
-						portalType = PortalType::WALL_PORTAL;
-					}
-
-					lexer.eat(TokenType::RBRA);
-
-				}
-			}
+			LoadedPortal portal;
+			wallModifier(currentColor, currentTexture, portal);
 
 			sf::Vector2f from0;
 			sf::Vector2f from1;
@@ -304,15 +310,7 @@ namespace ps {
 				from1 = vertex_;
 			}
 
-			if (portalType == PortalType::DOOR) {
-				currentPortal = std::make_shared<Door>(targetSegmentId);
-			}
-			else if (portalType == PortalType::WALL_PORTAL) {
-				currentPortal = std::make_shared<WallPortal>(
-					LineSegment(from0, from1),
-					LineSegment(to0, to1),
-					targetSegmentId);
-			}
+			currentPortal = portal.makePortal(from0, from1);
 
 			PortalWall wall(from0, from1, currentColor, currentTexture);
 			wall.setPortal(currentPortal);
@@ -338,7 +336,7 @@ namespace ps {
 		return namedSegments.get(idToken);
 	}
 
-	Segment LevelLoader::loadSegment()
+	Segment LevelLoader::segment()
 	{
 		SegmentBuilder builder(defaultFloor, defaultCeiling);
 
@@ -348,13 +346,13 @@ namespace ps {
 			auto & attribute = idToken.value.s;
 
 			if (attribute == "floor") {
-				loadFloorAttribute(builder);
+				floorAttribute(builder);
 			}
 			else if (attribute == "ceiling") {
-				loadCeilingAttribute(builder);
+				ceilingAttribute(builder);
 			}
 			else if (attribute == "walls") {
-				loadWallsAttribute(builder);
+				wallsAttribute(builder);
 			}
 			else {
 				throw IdentifierException(attribute, "Attribute", "Unknown segment attribute!", idToken.lineNumber);
@@ -365,21 +363,21 @@ namespace ps {
 		return builder.finalize();
 	}
 
-	void LevelLoader::loadSegments()
+	void LevelLoader::segments()
 	{
 		while (lexer.lookahead.type == TokenType::ID) {
 			// Segment entry format:
 			//     identifier : segment
 			Token idToken = lexer.eat(TokenType::ID);
 			lexer.eat(TokenType::COLON);
-			auto segment = loadSegment();
+			auto segment_ = segment();
 
-			getSegment(idToken).segment = std::make_shared<Segment>(segment);
+			getSegment(idToken).segment = std::make_shared<Segment>(segment_);
 			getSegment(idToken).defined = true;		// segment was defined now
 		}
 	}
 
-	void LevelLoader::loadPlayer()
+	void LevelLoader::player()
 	{
 		sf::Vector2f playerPosition2D = vertex();
 		sf::Vector3f playerPosition(playerPosition2D.x, playerPosition2D.y, 0.5f);
@@ -389,7 +387,7 @@ namespace ps {
 		Token idToken = lexer.eat(TokenType::ID);
 		std::size_t playerSegment = getSegment(idToken).id;
 	
-		player = ObjectInScene(playerPosition, playerDirection, playerSegment);
+		initialPlayer = ObjectInScene(playerPosition, playerDirection, playerSegment);
 	}
 
 	Level LevelLoader::loadLevel()
@@ -416,10 +414,10 @@ namespace ps {
 				loadMap();
 			}
 			else if (keyword == "SEGMENTS") {
-				loadSegments();
+				segments();
 			}
 			else if (keyword == "PLAYER") {
-				loadPlayer();
+				player();
 			}
 			else {
 				throw IdentifierException(keyword, "Section", "Unknown section!", idToken.lineNumber);
@@ -439,7 +437,7 @@ namespace ps {
 			segmentsVector[segment.id] = *(segment.segment);	// segment is coppied
 		}
 
-		return Level(std::move(segmentsVector), player);
+		return Level(std::move(segmentsVector), initialPlayer);
 	}
 
 	LevelLoader::SegmentWithId::SegmentWithId() : 
@@ -450,6 +448,25 @@ namespace ps {
 	LevelLoader::SegmentWithId::SegmentWithId(const std::shared_ptr<Segment> & segment_, std::size_t id_) : 
 		segment(segment_), id(id_), defined(false)
 	{
+	}
+
+	LevelLoader::LoadedPortal::LoadedPortal() : type(PortalType::NONE)
+	{
+	}
+
+	std::shared_ptr<Portal> LevelLoader::LoadedPortal::makePortal(sf::Vector2f from0, sf::Vector2f from1)
+	{
+		switch (type) {
+		case PortalType::NONE: return nullptr;
+			break;
+		case PortalType::DOOR: return std::make_shared<Door>(targetSegment);
+			break;
+		case PortalType::WALL_PORTAL: return std::make_shared<WallPortal>(LineSegment(from0, from1), LineSegment(to0, to1), targetSegment);
+			break;
+		}
+		
+		assert(false);
+		return nullptr;
 	}
 
 }

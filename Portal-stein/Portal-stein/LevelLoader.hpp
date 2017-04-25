@@ -107,8 +107,11 @@ namespace ps {
 		NamedValues<sf::Color>						namedColors;
 		NamedValues<sf::Vector2f>					namedVertices;
 		NamedValues<SegmentWithId>					namedSegments;
-		ObjectInScene player;
+		ObjectInScene initialPlayer;
 
+		SegmentWithId & getSegment(const Token & idToken);
+		// Loads vertex map. This procedure bypasses the lexer, and reads the input directly.
+		void loadMap();
 
 		// texture : "path_to_texture" | id
 		std::shared_ptr<sf::Texture> texture();
@@ -122,19 +125,39 @@ namespace ps {
 		sf::Vector2f vertex();
 		// vertices : (id ":" vertex)*
 		void vertices();
-		// loads vertex map
-		void loadMap();
+		// colorAndTexture : "(" color ")" | "(" texture ")" | "(" color "," texture ")"
+		void colorAndTexture(sf::Color & color, std::shared_ptr<sf::Texture> & texture);
+		// floorAttribute : colorAndTexture
+		void floorAttribute(SegmentBuilder & builder);
+		// ceilingAttribute : colorAndTexture
+		void ceilingAttribute(SegmentBuilder & builder);
 
-		void loadColorTexture(sf::Color & color, std::shared_ptr<sf::Texture> & texture);
+		enum class PortalType {
+			NONE, DOOR, WALL_PORTAL
+		};
 
-		void loadFloorAttribute(SegmentBuilder & builder);
-		void loadCeilingAttribute(SegmentBuilder & builder);
-		void loadWallsAttribute(SegmentBuilder & builder);
-		SegmentWithId & getSegment(const Token & idToken);
-		Segment loadSegment();
-		void loadSegments();
+		struct LoadedPortal {
+			PortalType type;
+			sf::Vector2f to0;
+			sf::Vector2f to1;
+			std::size_t targetSegment;
 
-		void loadPlayer();
+			LoadedPortal();
+			std::shared_ptr<Portal> makePortal(sf::Vector2f from0, sf::Vector2f from1);
+		};
+
+		// portal : ("[" id "]") | ("[" id "-" vertex "-" vertex "]") 
+		LoadedPortal portal();
+		// wallModifier : ("-" | (colorAndTexture? portal?))
+		void wallModifier(sf::Color & color, std::shared_ptr<sf::Texture> & texture, LoadedPortal & portal);
+		// wallsAttribute : colorAndTexture "{" vertex (wallModifier vertex)* wallModifier "}"
+		void wallsAttribute(SegmentBuilder & builder);
+		// segment : "{" floorAttribute? ceilingAttribute? wallsAttribute? "}"
+		Segment segment();
+		// segments : (id ":" segment)*
+		void segments();
+		// player : vertex "-" vertex "-" id
+		void player();
 
 	public:
 		LevelLoader(std::istream & input);
