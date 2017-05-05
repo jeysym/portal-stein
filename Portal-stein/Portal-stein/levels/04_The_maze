@@ -10,7 +10,7 @@ blue : (10, 20, 140)
 grey : (100, 100, 100)
 
 *MAP
-            l m
+     w z    l m
 
 a  b x g    h 
  P
@@ -19,9 +19,9 @@ c
 
 d  e
 
-o p  s
+o p      s
 
-q r    t
+q r        t
 
 *SEGMENTS
 start : {
@@ -33,7 +33,7 @@ start : {
 seg0 : {
     floor(stone_tex)
     ceiling(grey)
-    walls (brick_tex) { f[start]b-x[seg0-i-j]g-h[seg1]k-j[start-c-d]i- }
+    walls (brick_tex) { f[start]b-x[seg3]g-h[seg1]k-j[seg0-b-f]i- }
 }
 
 seg1 : {
@@ -46,6 +46,12 @@ seg2 : {
     floor(stone_tex)
     ceiling(grey)
     walls (brick_tex) { p-s[seg1-h-k]t-r[end]p- }
+}
+
+seg3 : {
+    floor(stone_tex)
+    ceiling(grey)
+    walls (brick_tex) { g[seg0]x-w[seg0-i-j]z- }
 }
 
 end : {

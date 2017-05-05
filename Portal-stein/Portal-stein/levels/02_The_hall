@@ -1,0 +1,55 @@
+*TEXTURES
+brick_tex : "textures\\bricks.bmp"
+metal_tex : "textures\\metal.bmp"
+stone_tex : "textures\\stone.bmp" 
+tile_tex  : "textures\\tile_floor.bmp"
+finish_tex : "textures\\finish.bmp"
+
+*COLORS
+c : (120, 230, 43)
+
+*MAP
+            z w
+
+a b g  i    x y    j
+  
+  c    k           l
+ P
+  d    m n
+
+f e h  o p
+
+*SEGMENTS
+final : {
+    finish
+    floor(finish_tex)
+    ceiling(finish_tex)
+    walls (finish_tex) { y[long]x-z-w- }
+}
+
+left : {
+    floor(tile_tex)
+    ceiling(tile_tex)
+    walls (brick_tex) { a-b[long-i-k]c-d[short-m-o]e-f- }
+}
+
+right : {
+    floor(tile_tex)
+    ceiling(tile_tex)
+    walls (brick_tex) { b-g-h-e[short-p-n]d-c[long-l-j] }
+} 
+
+long : {
+    floor(stone_tex)
+    ceiling(metal_tex)
+    walls (c) { k[left-c-b]i-x[final]y-j[right-b-c]l- }
+}
+ 
+short : {
+    floor(stone_tex)
+    ceiling(metal_tex)
+    walls (c) { o[left-e-d]m-n[right-d-e]p- }
+}
+
+*PLAYER
+P - (1, -1) - left 

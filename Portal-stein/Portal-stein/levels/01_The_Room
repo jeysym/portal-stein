@@ -1,0 +1,69 @@
+*TEXTURES
+brick_tex : "textures\\bricks.bmp"
+metal_tex : "textures\\metal.bmp"
+stone_tex : "textures\\stone.bmp" # this is a comment, yay
+tile_tex  : "textures\\tile_floor.bmp"
+finish_tex : "textures\\finish.bmp"
+
+*COLORS
+c : (120, 230, 43)
+
+*MAP
+  a           b
+
+s                c
+
+t                d
+
+  f           e
+
+g    h m    q
+
+
+     i n    
+
+     j o
+
+ P
+l    k p    r
+
+*SEGMENTS
+inner : {
+    floor((0,255,0), stone_tex)
+    ceiling(stone_tex)
+    walls (stone_tex) { a-b-c[right-n-o]d-e-f[final] }
+}
+
+final : {
+    finish 
+    floor(finish_tex)
+    ceiling(finish_tex)
+    walls (finish_tex) { s-a[inner]f-t-s- }
+}
+
+left : {
+    floor(tile_tex) 
+    ceiling(c, tile_tex)
+    walls (brick_tex) { g-h[up]i-j[down]k-l- }
+}
+
+up : {
+    floor(tile_tex) 
+    ceiling(c, tile_tex)
+    walls (brick_tex) { i[left]h-m[right]n- }
+}    
+
+right : {
+    floor(tile_tex) 
+    ceiling(c, tile_tex)
+    walls (brick_tex) { n[up]m-q-r-p[down]o[inner-d-c] }
+}
+
+down : {
+    floor(tile_tex) 
+    ceiling(c, tile_tex)
+    walls (brick_tex) { k[left]j-o[right]p- }
+}
+ 
+*PLAYER
+P - (1, -1) - left 
