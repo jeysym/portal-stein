@@ -17,7 +17,7 @@ namespace ps {
 	}
 
 	Segment::Segment(float floorHeight, float wallHeight, const Floor & floor_, const Ceiling & ceiling_) :
-		segmentFloorHeight(floorHeight), segmentWallHeight(wallHeight), floor(floor_), ceiling(ceiling_), walls() {
+		segmentFloorHeight(floorHeight), segmentWallHeight(wallHeight), floor(floor_), ceiling(ceiling_), walls(), finish(false) {
 
 	}
 

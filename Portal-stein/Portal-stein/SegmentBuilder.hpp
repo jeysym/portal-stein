@@ -37,6 +37,7 @@ namespace ps {
 		void setFloor(const Floor & floor);
 		void setCeiling(const Ceiling & ceiling);
 		void addWall(PortalWall && wall);
+		void setFinish(bool finish);
 		Segment&& finalize();
 	};
 

@@ -354,6 +354,9 @@ namespace ps {
 			else if (attribute == "walls") {
 				wallsAttribute(builder);
 			}
+			else if (attribute == "finish") {
+				builder.setFinish(true);
+			}
 			else {
 				throw IdentifierException(attribute, "Attribute", "Unknown segment attribute!", idToken.lineNumber);
 			}

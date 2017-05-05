@@ -2,10 +2,11 @@
 brick_tex : "textures\\bricks.bmp"
 tile_tex  : "textures\\tile_floor.bmp"
 stone_tex : "textures\\stone.bmp"
+finish_tex : "textures\\finish.bmp"
 
 *COLORS
 white : (255, 255, 255)
-red   : (255, 0, 0)
+red   : (255,        0, 0)
 green : (0, 255, 0)
 col0 : (255, 0, 0)
 col1 : (192, 66, 0)
@@ -17,25 +18,31 @@ col6 : (129, 129, 0)
 col7 : (192, 66, 0)
 
 *MAP
-           e     h      
+              e     h      
 
-             f g
-a          b     
- P
-d          c     
-             k l
+                f g
+x  a          b     
+    P
+y  d          c     
+                k l
 
-           m     n
+              m     n
 *SEGMENTS
 start : {
     floor(stone_tex)
     ceiling(red)
     walls (stone_tex){ a-b[seg0]c-d- }
 }
+final : {
+    finish
+    floor(finish_tex)
+    ceiling(finish_tex)
+    walls (finish_tex){ x-a[end]d-y- }
+}
 end : {
     floor(stone_tex)
     ceiling(green)
-    walls(stone_tex) { a-b[seg4]c-d- }
+    walls(stone_tex) { a-b[seg4]c-d[final] }
 }
 seg0 : {
     floor(col0, tile_tex)

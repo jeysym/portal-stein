@@ -45,6 +45,7 @@ namespace ps {
 		Segment(float floorHeight, float wallHeight, const Floor & floor, const Ceiling & ceiling);
 
 	public:
+		bool finish;
 		float segmentFloorHeight;
 		float segmentWallHeight;
 		Floor floor;

@@ -43,6 +43,11 @@ namespace ps {
 		}
 	}
 
+	void SegmentBuilder::setFinish(bool finish)
+	{
+		segment.finish = finish;
+	}
+
 	Segment && SegmentBuilder::finalize()
 	{
 		if (finalized)
