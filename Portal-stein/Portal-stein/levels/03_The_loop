@@ -18,15 +18,15 @@ col6 : (129, 129, 0)
 col7 : (192, 66, 0)
 
 *MAP
-              e     h      
+              e    h      
 
-                f g
-x  a          b     
+
+x  a          b fg  
     P
-y  d          c     
-                k l
+y  d          c kl  
+                
 
-              m     n
+              m    n
 *SEGMENTS
 start : {
     floor(stone_tex)
