@@ -31,7 +31,7 @@ Vertices form segments (rooms). Each segment must be convex polygon. Vertices of
 
 Walls of segment are specified in **walls** attribute of segment. It consists of list of vertices, that are separated by :
 
-- **---** : Default appearance of wall, and no portal.
+- **-** : Default appearance of wall, and no portal.
 - **(color) OR (texture) OR (color, texture)** : Overrides the default appearance of the wall.
 - **[targetSegment] OR [targetSegment-vertex-vertex]** : Wall will have portal attached to it.
 
@@ -39,7 +39,7 @@ Portal types
 -----------------
 - Portal with only *target segment* specified is used when position of the player needs not to be transformed upon stepping through the portal (segments are adjacent to each other).
 
- [door portal](portal01.png) 
+ ![door portal](portal01.png) 
 
     *SEGMENTS
     leftRoom : {
@@ -51,7 +51,7 @@ Portal types
 
 - If position of the player must be transformed upon stepping through the portal, the target wall must be specified (by its two vertices) in portal definition.
 
- [wall portal](portal02.png) 
+ ![wall portal](portal02.png) 
 
     *SEGMENTS
     leftRoom : {
