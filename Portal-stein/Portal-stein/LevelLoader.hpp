@@ -20,7 +20,7 @@ namespace ps {
 	// EXCEPTIONS
 	//*********************************************
 
-	// This exception is thrown when identifier that was not defined is encountered while parsing.
+	/// This exception is thrown when identifier that was not defined is encountered while parsing.
 	class IdentifierException : public std::exception {
 	public:
 		int lineNumber;
@@ -46,7 +46,7 @@ namespace ps {
 	// LEVEL LOADER (PARSER)
 	//**************************************************
 
-	// Class for storing values tied to some identifiers. This class handles errors as multiple defined identifier, or undefined identifier that is used, by throwing exception. 
+	/// Class for storing values tied to some identifiers. This class handles errors as multiple defined identifier, or undefined identifier that is used, by throwing exception. 
 	template<typename ValueT>
 	class NamedValues {
 		std::map<std::string, ValueT> data;
@@ -56,7 +56,8 @@ namespace ps {
 		NamedValues(const std::string & typeDescription_) : typeDescription(typeDescription_) {
 		}
 		
-		// Inserts value to the database. If this identifier was already defined IdentifierException will be thrown.
+		/// Inserts value to the database. If this identifier was already defined IdentifierException will be thrown.
+		/// \sa IdentifierException
 		void insertNew(const Token & idToken, const ValueT & value) {
 			assert(idToken.type == TokenType::ID);
 
@@ -69,13 +70,14 @@ namespace ps {
 			}
 		}
 
-		// Returns true if such identifier was defined previously.
+		/// Returns true if such identifier was defined previously.
 		bool contains(const Token & idToken) {
 			assert(idToken.type == TokenType::ID);
 			return (data.find(idToken.value.s) != data.end());
 		}
 
-		// Returns value tied to this identifier. If this identifier was not defined, IdentifierException will be thrown.
+		/// Returns value tied to this identifier. If this identifier was not defined, IdentifierException will be thrown.
+		/// \sa IdentifierException
 		ValueT & get(const Token & idToken) {
 			auto it = data.find(idToken.value.s);
 			if (it != data.end())
@@ -84,6 +86,7 @@ namespace ps {
 				throw IdentifierException(idToken.value.s, typeDescription, "Identifier was not defined prior to the use!", idToken.lineNumber);
 		}
 
+		/// Returns how many identifiers were defined.
 		std::size_t size() {
 			return data.size();
 		}
@@ -91,7 +94,7 @@ namespace ps {
 		friend class LevelLoader;
 	};
 
-	// Class that parses the level file, and reads all the information from it, constructing Level object.
+	/// Class that parses the level file, and reads all the information from it, constructing Level object.
 	class LevelLoader {
 	private:
 		Lexer lexer;
@@ -115,26 +118,26 @@ namespace ps {
 		ObjectInScene initialPlayer;
 
 		SegmentWithId & getSegment(const Token & idToken);
-		// Loads vertex map. This procedure bypasses the lexer, and reads the input directly.
+		/// Loads vertex map. This procedure bypasses the lexer, and reads the input directly.
 		void loadMap();
 
-		// texture : "path_to_texture" | id
+		/// texture : "path_to_texture" | id
 		std::shared_ptr<sf::Texture> texture();
-		// textures : (id ":" texture)*
+		/// textures : (id ":" texture)*
 		void textures();
-		// color : "(" int "," int "," int ")" | id
+		/// color : "(" int "," int "," int ")" | id
 		sf::Color color();
-		// colors : (id ":" color)*
+		/// colors : (id ":" color)*
 		void colors();
-		// vertex : "(" float "," float ")" | id
+		/// vertex : "(" float "," float ")" | id
 		sf::Vector2f vertex();
-		// vertices : (id ":" vertex)*
+		/// vertices : (id ":" vertex)*
 		void vertices();
-		// colorAndTexture : "(" color ")" | "(" texture ")" | "(" color "," texture ")"
+		/// colorAndTexture : "(" color ")" | "(" texture ")" | "(" color "," texture ")"
 		void colorAndTexture(sf::Color & color, std::shared_ptr<sf::Texture> & texture);
-		// floorAttribute : colorAndTexture
+		/// floorAttribute : colorAndTexture
 		void floorAttribute(SegmentBuilder & builder);
-		// ceilingAttribute : colorAndTexture
+		/// ceilingAttribute : colorAndTexture
 		void ceilingAttribute(SegmentBuilder & builder);
 
 		enum class PortalType {
@@ -151,22 +154,24 @@ namespace ps {
 			std::shared_ptr<Portal> makePortal(sf::Vector2f from0, sf::Vector2f from1);
 		};
 
-		// portal : ("[" id "]") | ("[" id "-" vertex "-" vertex "]") 
+		/// portal : ("[" id "]") | ("[" id "-" vertex "-" vertex "]") 
 		LoadedPortal portal();
-		// wallModifier : ("-" | (colorAndTexture? portal?))
+		/// wallModifier : ("-" | (colorAndTexture? portal?))
 		void wallModifier(sf::Color & color, std::shared_ptr<sf::Texture> & texture, LoadedPortal & portal);
-		// wallsAttribute : colorAndTexture "{" vertex (wallModifier vertex)* wallModifier "}"
+		/// wallsAttribute : colorAndTexture "{" vertex (wallModifier vertex)* wallModifier "}"
 		void wallsAttribute(SegmentBuilder & builder);
-		// segment : "{" floorAttribute? ceilingAttribute? wallsAttribute? "}"
+		/// segment : "{" floorAttribute? ceilingAttribute? wallsAttribute? "}"
 		Segment segment();
-		// segments : (id ":" segment)*
+		/// segments : (id ":" segment)*
 		void segments();
-		// player : vertex "-" vertex "-" id
+		/// player : vertex "-" vertex "-" id
 		void player();
 
 	public:
+		/// Creates new parser, that will read the level from given input stream.
+		/// \param input Stream containing the level description.
 		LevelLoader(std::istream & input);
-
+		/// Loads the level from the stream, and returns it.
 		Level loadLevel();
 	};
 }

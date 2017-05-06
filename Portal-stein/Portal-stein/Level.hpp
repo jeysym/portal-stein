@@ -8,7 +8,7 @@
 
 namespace ps {
 
-	// Represents level for the game. That means all the segments (+ textures).
+	/// Represents level for the game. That means all the segments (+ textures).
 	class Level {
 	private:
 		std::vector<std::shared_ptr<sf::Texture>> textures;
@@ -17,9 +17,9 @@ namespace ps {
 	public:
 		Level(std::vector<Segment> && segments_, ObjectInScene playerPos);
 
-		// Loads texture from file.
+		/// Loads texture from file.
 		sf::Texture * addTexture(std::string fileName);
-		// Makes scene that corresponds to the initial state of this level. (Can be called multiple times)
+		/// Makes scene that corresponds to the initial state of this level. (Can be called multiple times)
 		Scene makeScene();
 	};
 

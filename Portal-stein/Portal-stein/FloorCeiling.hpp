@@ -6,7 +6,7 @@
 
 namespace ps {
 
-	// Parameters that are passed, when floor (or ceiling) is drawn.
+	/// Parameters that are passed, when floor (or ceiling) is drawn.
 	struct FloorCeilingDrawParameters {
 		sf::Vector2f scrTop;
 		sf::Vector2f scrBottom;
@@ -24,23 +24,25 @@ namespace ps {
 	// FLOOR AND CEILING CLASS
 	//**************************************************************************
 
-	// Class representing floor (ceiling) that has color and texture.
+	/// Class representing floor (ceiling) that has color and texture.
 	class FloorCeiling {
 	private:
-		static sf::Shader shader;	// GLSL shader for displaying floors and ceilings.
+		static sf::Shader shader;	///< GLSL shader for displaying floors and ceilings.
 
 		sf::Color color;
 		std::shared_ptr<sf::Texture> texture;
 
 	public:
+		/// Compiles the GLSL shaders that are used to draw floors and ceilings. This must be done prior to drawing any floor or ceiling.
 		static void compileShaders();
 
-		// Draws this floor / ceiling according to draw parameters.
+		/// Draws this floor / ceiling according to draw parameters.
+		/// \param rt Render target used for drawing.
 		void draw(sf::RenderTarget & rt, const FloorCeilingDrawParameters & params) const;
 
-		// Creates colored floor/ceiling.
+		/// Creates colored floor/ceiling.
 		FloorCeiling(const sf::Color & color_);
-		// Creates floor/ceiling with color + texture.
+		/// Creates floor/ceiling with color + texture.
 		FloorCeiling(const sf::Color & color_, std::shared_ptr<sf::Texture> texture_);
 	};
 

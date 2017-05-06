@@ -10,31 +10,32 @@ namespace ps {
 	// DECLARATIONS
 	// *******************
 	
+	/// 2x2 matrix.
 	template< typename T >
 	class Matrix2 {
 	private:
 		T elements[2][2];
 
 	public:
-		// Initializes the matrix in following way:
-		//		| element00  element01 |
-		//		| element10  element11 |
+		/// Initializes the matrix in following way:
+		///		| element00  element01 |
+		///		| element10  element11 |
 		Matrix2(T element00, T element01, T element10, T element11);
-		// Initializes the matrix in following way:
+		/// Initializes the matrix in following way:
 		Matrix2(sf::Vector2<T> a, sf::Vector2<T> b);
-		// Cretes the zero matrix.
+		/// Cretes the zero matrix.
 		Matrix2();
 
 
-		// Sets the matrix element at specific position.
+		/// Sets the matrix element at specific position.
 		void setElement(std::size_t rowIndex, std::size_t columnIndex, T value);
-		// Gets the matrix element at the specific position.
+		/// Gets the matrix element at the specific position.
 		T getElement(std::size_t rowIndex, std::size_t columnIndex) const;
-		// Calculates the determinant of the matrix.
+		/// Calculates the determinant of the matrix.
 		T determinant() const;
 	};
 
-	// Multiplies a 2D vector with a 2x2 matrix.
+	/// Multiplies a 2D vector with a 2x2 matrix.
 	template< typename T >
 	inline sf::Vector2<T> matrixMultiply(const Matrix2<T> & matrix, const sf::Vector2<T> & vector);
 
@@ -46,7 +47,7 @@ namespace ps {
 		sf::Vector2<T> solution;
 	};
 
-	// Solves linear equations in form matrix * x = b. (By using Cramer's rule)
+	/// Solves linear equations in form matrix * x = b. (By using Cramer's rule)
 	template< typename T >
 	inline Solution<T> linearSolve(const Matrix2<T> & matrix, const sf::Vector2<T> & b);
 
