@@ -27,7 +27,7 @@ namespace ps {
 		sf::Vector2f to;
 
 	public:
-		LineSegment(sf::Vector2f from_, sf::Vector2f to_);
+		LineSegment(const sf::Vector2f & from_, const sf::Vector2f & to_);
 
 		// Gets the starting point of line segment.
 		sf::Vector2f getFrom() const;

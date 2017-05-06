@@ -45,7 +45,7 @@ namespace ps {
 		Segment(float floorHeight, float wallHeight, const Floor & floor, const Ceiling & ceiling);
 
 	public:
-		bool finish;
+		bool finish;				// Segments marked with finish flag move the player into next level.
 		float segmentFloorHeight;
 		float segmentWallHeight;
 		Floor floor;
@@ -70,6 +70,8 @@ namespace ps {
 
 	class Scene;
 
+	// Object in scene, that is aware of the scene (meaning it will not pass through walls), and it can be manipulated by applying force on it.
+	// User must first apply all forces to this object, and the call simulate() to update object speed and angular speed.
 	class FloatingObjInScene : public ObjectInScene {
 	private:
 		sf::Vector3f force;
@@ -85,11 +87,16 @@ namespace ps {
 		virtual void rotate(float angle) override;
 		virtual void move(sf::Vector3f offset) override;
 
+		// Applies force on the object.
 		void applyForce(const sf::Vector3f & force_);
+		// Applies torque on the object.
 		void applyTorque(float torque);
+		// Simulates all the applied forces and torques on the object, which changes the speed and angular speed. After this call all applied forces and torques
+		// on this object are forgot.
 		void simulate(float deltaTime);
-
+		// Gets speed of the object (in unit/s).
 		sf::Vector3f getSpeed() const;
+		// Gets angular speed of the object (in rad/s).
 		float getAngularSpeed() const;
 
 		FloatingObjInScene(const ObjectInScene & obj, float mass_, Scene & scene_);
@@ -140,11 +147,6 @@ namespace ps {
 		Scene(const ObjectInScene & camera_);
 		Scene(const Scene & rhs);
 		Scene & operator=(const Scene & rhs);
-
-		/*Scene(const Scene & rs) = default;
-		Scene(Scene && rs) = default;
-		Scene & operator=(const Scene & rs) = default;
-		Scene & operator=(Scene && rs) = default;*/
 
 		// Adds a new segment. Its unique id is returned.
 		std::size_t addSegment(Segment && segment_);

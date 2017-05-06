@@ -120,17 +120,3 @@ TEST_F(GeometryTest, MapLSTestScaled) {
 	EXPECT_VEC2NEAR(sf::Vector2f(0.0f, 1.0f), x.getDirection(), 0.01);
 	EXPECT_EQ(0, x.getSegmentId());
 }
-
-TEST_F(GeometryTest, MapLSTestScaledWithDirection) {
-	ObjectInScene x{ sf::Vector3f{ 0.0f, 2.0f, 0.0f }, sf::Vector2f{ 1.0f, 2.0f }, 0 };
-
-	LineSegment from{ sf::Vector2f{ 1.0f, 0.0f }, sf::Vector2f{ 1.0f, 4.0f } };
-	LineSegment to{ sf::Vector2f{ 5.0f, 1.0f }, sf::Vector2f{ 5.0, 3.0 } };
-
-	auto expectedDirection = normalized(sf::Vector2f(1.0f, 1.0f));
-
-	LineSegment::mapLineSegments(from, to, x);
-	EXPECT_VEC3NEAR(sf::Vector3f(4.0f, 2.0f, 0.0f), x.getPosition(), 0.01);
-	EXPECT_VEC2NEAR(expectedDirection, x.getDirection(), 0.01);
-	EXPECT_EQ(0, x.getSegmentId());
-}

@@ -46,6 +46,7 @@ namespace ps {
 	// LEVEL LOADER (PARSER)
 	//**************************************************
 
+	// Class for storing values tied to some identifiers. This class handles errors as multiple defined identifier, or undefined identifier that is used, by throwing exception. 
 	template<typename ValueT>
 	class NamedValues {
 		std::map<std::string, ValueT> data;
@@ -54,7 +55,8 @@ namespace ps {
 	public:
 		NamedValues(const std::string & typeDescription_) : typeDescription(typeDescription_) {
 		}
-
+		
+		// Inserts value to the database. If this identifier was already defined IdentifierException will be thrown.
 		void insertNew(const Token & idToken, const ValueT & value) {
 			assert(idToken.type == TokenType::ID);
 
@@ -67,11 +69,13 @@ namespace ps {
 			}
 		}
 
+		// Returns true if such identifier was defined previously.
 		bool contains(const Token & idToken) {
 			assert(idToken.type == TokenType::ID);
 			return (data.find(idToken.value.s) != data.end());
 		}
 
+		// Returns value tied to this identifier. If this identifier was not defined, IdentifierException will be thrown.
 		ValueT & get(const Token & idToken) {
 			auto it = data.find(idToken.value.s);
 			if (it != data.end())
@@ -87,6 +91,7 @@ namespace ps {
 		friend class LevelLoader;
 	};
 
+	// Class that parses the level file, and reads all the information from it, constructing Level object.
 	class LevelLoader {
 	private:
 		Lexer lexer;

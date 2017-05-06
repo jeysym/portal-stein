@@ -27,6 +27,7 @@ namespace ps {
 	// SEGMENT BUILDER
 	//******************************************************************
 
+	// Class used for building segments. This class makes sure that built segment is correct (walls are adjacent, they form a convex polygon).
 	class SegmentBuilder {
 	private:
 		Segment segment;
@@ -38,6 +39,7 @@ namespace ps {
 		void setCeiling(const Ceiling & ceiling);
 		void addWall(PortalWall && wall);
 		void setFinish(bool finish);
+		// Ends segment building and returns loaded segment. After this call no other methods of this class shall be called.
 		Segment&& finalize();
 	};
 

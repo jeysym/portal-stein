@@ -2,7 +2,8 @@
 #include "Solve.hpp"
 
 namespace ps {
-	LineSegment::LineSegment(sf::Vector2f from_, sf::Vector2f to_) : from(from_), to(to_) { }
+
+	LineSegment::LineSegment(const sf::Vector2f & from_, const sf::Vector2f & to_) : from(from_), to(to_) { }
 
 	sf::Vector2f LineSegment::getFrom() const
 	{
