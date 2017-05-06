@@ -9,15 +9,22 @@ namespace ps {
 
 	class Game {
 	private:
+		static sf::Font textFont;
+		static sf::Texture splashTex, winTex;
+
+		bool infoEnabled;
 		std::vector<Level> levels;
+		RayCaster caster;
 
 		void simulateDrag(Scene & scene);
-		void processUserInput(sf::RenderWindow & window, Scene & caster, float deltaTime);
-		void loadFont();
+		void processGameInput(sf::RenderWindow & window, Scene & caster, float deltaTime);
+		void drawInfo(sf::RenderTarget & window, Scene & scene, float secondsElapsed);
+
+		void runSplashScreen(sf::RenderWindow & window);
+		void runGameplay(Level & level, sf::RenderWindow & window);
+		void runWinScreen(sf::RenderWindow & window);
 
 	public:
-		Game();
-
 		float walkForce;
 		float ascendForce;
 		float rotateTorque;
@@ -26,8 +33,12 @@ namespace ps {
 		float walkDragCoefficient2;
 		float rotateDragCoefficient;
 
-		void run();
+
+		static void init();
+		Game();
+
 		void loadLevels(const std::string & levelDirPath);
+		void run();
 	};
 }
 

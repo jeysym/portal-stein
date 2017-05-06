@@ -9,85 +9,30 @@
 
 namespace ps {
 
-	void Game::simulateDrag(Scene & scene) {
-		auto speed = scene.camera.getSpeed();
-		auto angularSpeed = scene.camera.getAngularSpeed();
+	sf::Font Game::textFont;
+	sf::Texture Game::splashTex;
+	sf::Texture Game::winTex;
 
-		auto walkDrag = -1.0f * walkDragCoefficient1 * speed - walkDragCoefficient2 * norm(speed) * speed;
-		auto rotateDrag = -1.0f * angularSpeed * rotateDragCoefficient;
-
-		scene.camera.applyForce(walkDrag);
-		scene.camera.applyTorque(rotateDrag);
-	}
-
-	void processEvents(sf::RenderWindow & window) {
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// dispatch all the events in the queue
-
-			if (event.type == sf::Event::Closed)
-				window.close();
-
-			if (event.type == sf::Event::Resized) {
-				// If window gets resized, the window gets recreated with different video mode
-				auto width = window.getSize().x;
-				auto height = window.getSize().y;
-
-				window.create(sf::VideoMode{ width, height }, "Portal-stein");
-			}
-		}
-	}
-
-
-	void Game::processUserInput(sf::RenderWindow & window, Scene & scene, float deltaTime)
+	void Game::init()
 	{
-		processEvents(window);
+		// Floor ceiling must have its shaders compiled before the game starts.
+		FloorCeiling::compileShaders();
 
-		auto direction = ps::toVector3(scene.camera.getDirection());
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-			scene.camera.applyForce(walkForce * direction);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-			scene.camera.applyForce(-1.0f * walkForce * direction);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-			scene.camera.applyTorque(rotateTorque);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-			scene.camera.applyTorque(-1.0f * rotateTorque);
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, 1.0f));
-		}
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, -1.0f));
-		}
-	}
-
-	sf::Font textFont;
-
-	void Game::loadFont()
-	{
 		std::string pathToFont = "fonts\\OpenBaskerville-0.0.53.otf";
 		bool success = textFont.loadFromFile(pathToFont);
 
-		if (success == false) 
+		if (success == false)
 			throw std::runtime_error("Font " + pathToFont + " could not be loaded!");
+	
+		if (!splashTex.loadFromFile("splash.png"))
+			throw std::runtime_error("Texture splash.png could not be loaded!");
+
+		if (!winTex.loadFromFile("win.png"))
+			throw std::runtime_error("Texture win.png could not be loaded!");
 	}
 
 	Game::Game() : levels()
 	{
-		// Floor ceiling must have its shaders compiled before the game starts.
-		FloorCeiling::compileShaders();
-		
-		loadFont();
-
 		walkForce = 200.0f;
 		ascendForce = 20.0f;
 		rotateTorque = 100.0f;
@@ -95,110 +40,8 @@ namespace ps {
 		walkDragCoefficient1 = 70.0f;
 		walkDragCoefficient2 = 10.0f;
 		rotateDragCoefficient = 100.0f;
-	}
 
-	void drawInfo(sf::RenderTarget & window, Scene & scene, float secondsElapsed)
-	{
-		sf::Text info{ "N/A", textFont };
-		info.setFillColor(sf::Color::Black);
-		info.setStyle(sf::Text::Bold);
-
-		auto position = scene.camera.getPosition();
-		auto direction = scene.camera.getDirection();
-		auto segmentId = scene.camera.getSegmentId();
-
-		info.setString(
-			"pos = (" + std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z) + ")\n" +
-			"dir = (" + std::to_string(direction.x) + "," + std::to_string(direction.y) + ")\n" +
-			"segment = " + std::to_string(segmentId) + "\n" +
-			"fps = " + std::to_string((int)(1.0f / secondsElapsed))
-		);
-
-		window.draw(info);
-	}
-
-	void doSplashScreen(sf::RenderWindow & window) {
-		sf::Sprite splashSprite;
-		sf::Texture splashTex;
-		splashTex.loadFromFile("splash.png");
-		splashSprite.setTexture(splashTex);
-
-		window.draw(splashSprite);
-		window.display();
-
-		sf::Event e;
-		while (window.waitEvent(e)) {
-
-			if (e.type == sf::Event::Closed)
-				window.close();
-
-			if (e.type == sf::Event::Resized) {
-				// If window gets resized, the window gets recreated with different video mode
-				auto width = window.getSize().x;
-				auto height = window.getSize().y;
-
-				window.create(sf::VideoMode{ width, height }, "Portal-stein");
-			}
-
-			if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Return)
-				break;
-		}
-	}
-
-	void doWinScreen(sf::RenderWindow & window) {
-		sf::Sprite winSprite;
-		sf::Texture winTex;
-		winTex.loadFromFile("win.png");
-		winSprite.setTexture(winTex);
-
-		window.draw(winSprite);
-		window.display();
-
-		while (window.isOpen())
-			processEvents(window);
-	}
-
-	void Game::run()
-	{
-		RayCaster caster;
-				
-		unsigned int wWidth = 800;
-		unsigned int wHeight = 600;
-		sf::RenderWindow window( sf::VideoMode( wWidth, wHeight ), "Portal-stein" );
-		window.setVerticalSyncEnabled(true);
-
-		doSplashScreen(window);
-
-		for (Level & level : levels) {
-
-			auto && scene = level.makeScene();
-			// get the clock object
-			sf::Clock clock;
-			float deltaTime = 0.001f;
-
-			bool finish = false;
-			do
-			{
-				// measure the time elapsed from the last draw
-				deltaTime = clock.getElapsedTime().asSeconds();
-				clock.restart();
-
-				processUserInput(window, scene, deltaTime);
-				simulateDrag(scene);
-				scene.camera.simulate(deltaTime);
-
-				window.clear(sf::Color::Black);			// clear the window
-				caster.render(window, scene);			// render the game
-				//drawInfo(window, scene, deltaTime);		// draw some additional info like position, direction, fps
-
-				Segment & cameraSegment = scene.getSegment(scene.camera.getSegmentId());
-				finish = cameraSegment.finish;
-
-				window.display();
-			} while (finish == false && window.isOpen());
-		}
-
-		doWinScreen(window);
+		infoEnabled = false;
 	}
 
 	void Game::loadLevels(const std::string & levelDirPath) {
@@ -248,6 +91,178 @@ namespace ps {
 				}
 			}
 		}
+	}
+
+	void processBasicEvent(sf::RenderWindow & window, sf::Event & e) {
+		if (e.type == sf::Event::Closed)
+			window.close();
+
+		if (e.type == sf::Event::Resized) {
+			// If window gets resized, the window gets recreated with different video mode
+			auto width = window.getSize().x;
+			auto height = window.getSize().y;
+
+			window.create(sf::VideoMode{ width, height }, "Portal-stein");
+		}
+	}
+	
+	void Game::runSplashScreen(sf::RenderWindow & window)
+	{
+		sf::Sprite splash;
+		splash.setTexture(splashTex);
+		
+		bool enterPressed = false;
+		do {
+			sf::Event e;
+			while (window.pollEvent(e)) {
+				processBasicEvent(window, e);
+
+				if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Return)
+					enterPressed = true;
+			}
+
+			float sX = (float)window.getSize().x / splashTex.getSize().x;
+			float sY = (float)window.getSize().y / splashTex.getSize().y;
+			splash.setScale(sX, sY);
+
+			window.draw(splash);
+			window.display();
+		} while (!enterPressed && window.isOpen());
+	}
+
+	void Game::runGameplay(Level & level, sf::RenderWindow & window)
+	{
+		auto && scene = level.makeScene();
+		// get the clock object
+		sf::Clock clock;
+		float deltaTime = 0.001f;
+
+		bool finish = false;
+		do
+		{
+			// measure the time elapsed from the last draw
+			deltaTime = clock.getElapsedTime().asSeconds();
+			clock.restart();
+
+			sf::Event e;
+			while (window.pollEvent(e)) {
+				processBasicEvent(window, e);
+
+				// Toggle info drawing on pressing F1
+				if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::F1)
+					infoEnabled = !infoEnabled;
+			}
+
+			processGameInput(window, scene, deltaTime);
+			simulateDrag(scene);
+			scene.camera.simulate(deltaTime);
+
+			window.clear(sf::Color::Black);			// clear the window
+			caster.render(window, scene);			// render the game
+			
+			if (infoEnabled)
+				drawInfo(window, scene, deltaTime);		// draw some additional info like position, direction, fps
+
+			Segment & cameraSegment = scene.getSegment(scene.camera.getSegmentId());
+			finish = cameraSegment.finish;
+
+			window.display();
+		} while (finish == false && window.isOpen());
+	}
+
+	void Game::runWinScreen(sf::RenderWindow & window)
+	{
+		sf::Sprite splash;
+		splash.setTexture(winTex);
+
+		while (window.isOpen()) {
+			sf::Event e;
+			while (window.pollEvent(e))
+				processBasicEvent(window, e);
+
+			float sX = (float)window.getSize().x / splashTex.getSize().x;
+			float sY = (float)window.getSize().y / splashTex.getSize().y;
+			splash.setScale(sX, sY);
+
+			window.draw(splash);
+			window.display();
+		} 
+	}
+
+	void Game::processGameInput(sf::RenderWindow & window, Scene & scene, float deltaTime)
+	{
+		auto direction = ps::toVector3(scene.camera.getDirection());
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			scene.camera.applyForce(walkForce * direction);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+			scene.camera.applyForce(-1.0f * walkForce * direction);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+			scene.camera.applyTorque(rotateTorque);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+			scene.camera.applyTorque(-1.0f * rotateTorque);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, 1.0f));
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+			scene.camera.applyForce(ascendForce * sf::Vector3f(0.0f, 0.0f, -1.0f));
+		}
+	}
+	
+	void Game::simulateDrag(Scene & scene) {
+		auto speed = scene.camera.getSpeed();
+		auto angularSpeed = scene.camera.getAngularSpeed();
+
+		auto walkDrag = -1.0f * walkDragCoefficient1 * speed - walkDragCoefficient2 * norm(speed) * speed;
+		auto rotateDrag = -1.0f * angularSpeed * rotateDragCoefficient;
+
+		scene.camera.applyForce(walkDrag);
+		scene.camera.applyTorque(rotateDrag);
+	}
+
+	void Game::drawInfo(sf::RenderTarget & window, Scene & scene, float secondsElapsed)
+	{
+		sf::Text info{ "N/A", Game::textFont };
+		info.setFillColor(sf::Color::Black);
+		info.setStyle(sf::Text::Bold);
+
+		auto position = scene.camera.getPosition();
+		auto direction = scene.camera.getDirection();
+		auto segmentId = scene.camera.getSegmentId();
+
+		info.setString(
+			"pos = (" + std::to_string(position.x) + "," + std::to_string(position.y) + "," + std::to_string(position.z) + ")\n" +
+			"dir = (" + std::to_string(direction.x) + "," + std::to_string(direction.y) + ")\n" +
+			"segment = " + std::to_string(segmentId) + "\n" +
+			"fps = " + std::to_string((int)(1.0f / secondsElapsed))
+		);
+
+		window.draw(info);
+	}
+
+	void Game::run()
+	{
+		RayCaster caster;
+				
+		unsigned int wWidth = 800;
+		unsigned int wHeight = 600;
+		sf::RenderWindow window( sf::VideoMode( wWidth, wHeight ), "Portal-stein" );
+		window.setVerticalSyncEnabled(true);
+
+		runSplashScreen(window);
+
+		for (Level & level : levels)
+			runGameplay(level, window);
+
+		runWinScreen(window);
 	}
 
 }

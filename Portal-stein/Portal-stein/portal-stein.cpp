@@ -4,6 +4,7 @@
 namespace ps {
 
 	int main() {
+		Game::init();
 		Game myGame;
 
 		std::string levelDirPath = "levels";	// levels are kept in ./levels directory
